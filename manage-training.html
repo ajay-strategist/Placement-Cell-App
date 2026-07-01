@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Training - Placement Cell</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/permissions.js"></script>
+</head>
+<body class="premium-ui">
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="college-logo-placeholder" style="margin-bottom: 1rem;">CC</div>
+            <a href="#" id="sidebarBrandLink" class="sidebar-brand">Admin Portal</a>
+            <ul class="sidebar-nav">
+                <li><a href="#" id="backToDashboardLink" class="sidebar-link active">Back to Dashboard</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content" style="padding: 0;">
+            <div class="top-header">
+                <div>
+                    <div class="breadcrumb">Training / Manage Program</div>
+                    <h1 class="page-title" id="programName">Program Management</h1>
+                </div>
+                <div class="user-profile">
+                    <div class="user-info" style="text-align: right;">
+                        <span class="user-name" id="welcomeUser">Welcome, Admin</span>
+                    </div>
+                    <div class="user-avatar" id="userAvatarBadge">A</div>
+                </div>
+            </div>
+
+            <div class="content-body">
+                <div id="programDetailsCard" class="glass-card mb-4" style="background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h3 id="detName" class="gradient-text mb-2">Program Name</h3>
+                            <p id="detDesc" class="text-muted mb-3"></p>
+                            <div class="d-flex flex-column gap-2 mt-1">
+                                <span>
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="#0D6EFC" style="margin-right:5px;vertical-align:middle;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                    <strong>Venue:</strong> <span id="detVenue"></span>
+                                </span>
+                                <span>
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="#0D6EFC" style="margin-right:5px;vertical-align:middle;"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+                                    <strong>Date:</strong> <span id="detDate"></span>
+                                </span>
+                                <span>
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="#0D6EFC" style="margin-right:5px;vertical-align:middle;"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+                                    <strong>Duration:</strong> <span id="detDays"></span> Days
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div style="background: var(--primary-color); color: white; padding: 1rem; border-radius: 12px; min-width: 120px;">
+                                <h2 id="detRegCount" style="color: white; margin: 0;">0</h2>
+                                <small>Registered</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <div class="tab active" data-tab="registrations">Registered Students</div>
+                    <div class="tab" data-tab="batches">Manage Batches</div>
+                    <div class="tab" data-tab="dashboard">Dashboard Analytics</div>
+                    <div class="tab" data-tab="reports">Reports</div>
+                    <div class="tab" data-tab="reviews">Student Reviews</div>
+                </div>
+
+                <!-- Registrations Tab -->
+                <div id="registrationsTab" class="tab-content active">
+                    <div class="stat-grid-4 mb-4" id="regOverview"></div>
+                    <div class="glass-card">
+                        <div class="mb-3">
+                            <h5 class="mb-3">List of Registered Students</h5>
+                            <div class="d-flex align-items-end gap-2" style="flex-wrap:wrap;">
+                                <div class="form-group mb-0">
+                                    <label class="form-label">Batch</label>
+                                    <select id="regBatchFilter" class="form-control" style="min-width:160px;">
+                                        <option value="">All Batches</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-0">
+                                    <label class="form-label">Department</label>
+                                    <select id="regDeptFilter" class="form-control" style="min-width:160px;">
+                                        <option value="">All Departments</option>
+                                    </select>
+                                </div>
+                                <div style="flex:1 1 auto;"></div>
+                                <div class="form-group mb-0">
+                                    <label class="form-label">Assign Selected To</label>
+                                    <select id="bulkBatchSelect" class="form-control" style="min-width:170px;">
+                                        <option value="">Assign to Batch...</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary btn-sm" id="bulkAssignBtn" style="height:38px;">Assign Selected</button>
+                                <button class="btn btn-secondary btn-sm" id="removeFromBatchBtn" style="height:38px;" title="Remove selected from any batch">Remove from Batch</button>
+                            </div>
+                        </div>
+                        <table class="table" id="regTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:36px;"><input type="checkbox" id="selectAllReg" title="Select All"></th>
+                                    <th>Reg No</th>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Course</th>
+                                    <th>Batch</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Batches Tab -->
+                <div id="batchesTab" class="tab-content">
+                    <div class="glass-card mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="mb-0">Batch Management</h4>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary btn-sm" id="addBatchBtn">+ New Batch</button>
+                            </div>
+                        </div>
+                        <!-- Auto-split panel -->
+                        <div class="p-3 mb-4 rounded" style="background: #f0f4ff; border: 1px dashed #0D6EFC;">
+                            <h6 style="color: #0D6EFC; margin-bottom:0.75rem;">⚡ Auto-Split Students into Batches</h6>
+                            <div class="d-flex flex-wrap gap-2 align-items-end">
+                                <div class="form-group mb-0">
+                                    <label class="form-label">Split Method</label>
+                                    <select id="autoSplitMethod" class="form-control" style="min-width:180px;">
+                                        <option value="num_batches">By number of batches</option>
+                                        <option value="batch_size">By max students per batch</option>
+                                        <option value="by_class">By Class</option>
+                                        <option value="by_department">By Department</option>
+                                    </select>
+                                </div>
+                                <div class="form-group mb-0">
+                                    <label class="form-label" id="autoSplitValueLabel">Number of Batches</label>
+                                    <input type="number" id="autoSplitValue" class="form-control" min="1" value="3" style="width:120px;">
+                                </div>
+                                <button class="btn btn-primary btn-sm" id="autoSplitBtn" style="height:38px;">Auto Split</button>
+                                <small class="text-muted" style="align-self:center;">⚠️ This will overwrite existing batch assignments.</small>
+                            </div>
+                        </div>
+                        <div id="batchesList" style="display:flex; flex-direction:column; gap:1rem;"></div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Tab -->
+                <div id="dashboardTab" class="tab-content">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <label class="form-label mb-0" style="white-space:nowrap;">Filter by Batch:</label>
+                        <select id="dashboardBatchFilter" class="form-control" style="max-width:200px; padding:0.4rem 0.6rem; font-size:0.85rem;">
+                            <option value="">All Batches</option>
+                        </select>
+                    </div>
+                    <!-- Stat Cards -->
+                    <div class="grid-layout mb-4" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+                        <div class="glass-card text-center" style="border-top: 5px solid #000080;">
+                            <h2 id="cardAttendedMale">0</h2>
+                            <p class="text-muted small">Attended Males</p>
+                        </div>
+                        <div class="glass-card text-center" style="border-top: 5px solid #6f42c1;">
+                            <h2 id="cardAttendedFemale">0</h2>
+                            <p class="text-muted small">Attended Females</p>
+                        </div>
+                        <div class="glass-card text-center" style="border-top: 5px solid #dc3545;">
+                            <h2 id="cardNotAttended">0</h2>
+                            <p class="text-muted small">Not Attended</p>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="glass-card">
+                            <h5 class="mb-4">Gender Wise Attendance (Pie)</h5>
+                            <canvas id="chartGender"></canvas>
+                        </div>
+                        <div class="glass-card">
+                            <h5 class="mb-4">Dept Wise Attendance (Column)</h5>
+                            <canvas id="chartDept"></canvas>
+                        </div>
+                        <div class="glass-card" style="grid-column: span 2;">
+                            <h5 class="mb-4">Registered vs Attended by Dept</h5>
+                            <canvas id="chartRegVsAttn"></canvas>
+                        </div>
+                        <div class="glass-card">
+                            <h5 class="mb-4">Session Wise Attendance</h5>
+                            <canvas id="chartSession"></canvas>
+                        </div>
+                        <div class="glass-card">
+                            <h5 class="mb-4">Review Ratings Distribution</h5>
+                            <canvas id="chartRating"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div id="reportsTab" class="tab-content">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h4 class="mb-0">Training Reports</h4>
+                            <small class="text-muted">Completion rule: attendance &ge; <span id="repThreshold">75</span>%</small>
+                        </div>
+                        <div class="d-flex gap-2 align-items-center">
+                            <label class="form-label mb-0" style="white-space:nowrap;">Completion %</label>
+                            <input id="completionThreshold" type="number" min="1" max="100" value="75" class="form-control" style="width:90px;" onchange="renderReports()">
+                            <button class="btn btn-success btn-sm" onclick="exportReportExcel()">⬇ Export Excel</button>
+                        </div>
+                    </div>
+
+                    <!-- Summary cards -->
+                    <div class="stat-grid-4 mb-4" id="reportSummary"></div>
+
+                    <!-- Batch-wise breakdown -->
+                    <div class="glass-card mb-4">
+                        <h5 class="mb-3">Batch-wise Summary</h5>
+                        <div class="table-responsive">
+                            <table class="table" id="reportBatchTable">
+                                <thead><tr><th>Batch</th><th>Students</th><th>Attended</th><th>Not Attended</th><th>Completed</th><th>Avg Attendance %</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Per-student detail -->
+                    <div class="glass-card mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Student-wise Report</h5>
+                            <div class="d-flex gap-2">
+                                <select id="reportBatchFilter" class="form-control" style="max-width:180px;" onchange="renderReports()">
+                                    <option value="">All Batches</option>
+                                </select>
+                                <select id="reportStatusFilter" class="form-control" style="max-width:220px;" onchange="renderReports()">
+                                    <option value="all">All Students</option>
+                                    <option value="notattended">Registered but Not Attended</option>
+                                    <option value="below">Below Completion Threshold</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table" id="reportStudentTable">
+                                <thead><tr><th>Reg No</th><th>Name</th><th>Class</th><th>Batch</th><th>Sessions Attended</th><th>Attendance %</th><th>Status</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reviews Tab -->
+                <div id="reviewsTab" class="tab-content">
+                    <div class="glass-card">
+                        <h4 class="mb-4">Student Feedbacks & Reviews</h4>
+                        <div id="reviewsList" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <!-- Review cards will be injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Attendance Modal -->
+    <div id="attnModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+        <div class="glass-card" style="width: 450px;">
+            <h4 id="attnModalTitle">Upload Attendance</h4>
+            <p id="attnModalSubtitle" class="text-muted small mb-3"></p>
+            <div class="form-group">
+                <label class="form-label">Excel File (Register Number column)</label>
+                <input type="file" id="attnFile" class="form-control" accept=".xlsx, .xls">
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-secondary btn-sm w-100" id="downloadAttnTemplate">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="margin-right: 5px;"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    Download Template
+                </button>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <button class="btn btn-secondary" onclick="document.getElementById('attnModal').classList.add('hidden')">Cancel</button>
+                <button class="btn btn-primary" id="confirmAttnUpload">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Attendance Modal -->
+    <div id="manualAttnModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+        <div class="glass-card" style="width: 600px; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                    <h4 id="manualAttnModalTitle" class="mb-1">Mark Attendance</h4>
+                    <p id="manualAttnModalSubtitle" class="text-muted small mb-0"></p>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('manualAttnModal').classList.add('hidden')">✕</button>
+            </div>
+            
+            <div class="d-flex gap-2 mb-3 mt-3">
+                <button class="btn btn-outline-primary btn-sm" id="selectAllAttnBtn">Select All</button>
+                <button class="btn btn-outline-secondary btn-sm" id="deselectAllAttnBtn">Deselect All</button>
+            </div>
+            
+            <div style="flex-grow: 1; overflow-y: auto; margin-bottom: 15px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                <table class="table mb-0" id="manualAttnTable">
+                    <thead style="position: sticky; top: 0; background: #f8f9fa;">
+                        <tr>
+                            <th>Reg No</th>
+                            <th>Name</th>
+                            <th>Course</th>
+                            <th class="text-center">Present</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            
+            <div class="d-flex justify-content-end gap-2 mt-auto">
+                <button class="btn btn-secondary" onclick="document.getElementById('manualAttnModal').classList.add('hidden')">Cancel</button>
+                <button class="btn btn-primary" id="saveManualAttnBtn">Save Attendance</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Session Modal -->
+    <div id="editSessionModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+        <div class="glass-card" style="width: 420px;">
+            <h4 class="mb-4">Edit Session</h4>
+            <div class="form-group mb-3">
+                <label class="form-label">Session Date</label>
+                <input type="date" id="editSessionDate" class="form-control">
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Session Time</label>
+                <input type="time" id="editSessionTime" class="form-control">
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Batch</label>
+                <select id="editSessionBatch" class="form-control">
+                    <option value="">All Students</option>
+                </select>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <button class="btn btn-secondary" onclick="document.getElementById('editSessionModal').classList.add('hidden')">Cancel</button>
+                <button class="btn btn-primary" id="saveEditSessionBtn">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Modal (batch details, not-attended lists, etc.) -->
+    <div id="genericModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1100;">
+        <div class="modal-content" style="background:#fff; width:760px; max-width:95vw; max-height:85vh; overflow:hidden; display:flex; flex-direction:column;">
+            <div style="background: linear-gradient(135deg, #0a0f1c 0%, #1d4ed8 100%); color:#fff; padding:1.25rem 1.5rem; display:flex; justify-content:space-between; align-items:center;">
+                <h4 id="genericModalTitle" style="margin:0; color:#fff;">Details</h4>
+                <button class="btn" onclick="closeGenericModal()" style="background:rgba(255,255,255,0.2); color:#fff; border:none; border-radius:50%; width:34px; height:34px; padding:0;">✕</button>
+            </div>
+            <div id="genericModalBody" style="padding:1.5rem; overflow-y:auto;"></div>
+        </div>
+    </div>
+
+    <script>
+        window.openGenericModal = (title, html) => {
+            document.getElementById('genericModalTitle').textContent = title;
+            document.getElementById('genericModalBody').innerHTML = html;
+            document.getElementById('genericModal').classList.remove('hidden');
+        };
+        window.closeGenericModal = () => document.getElementById('genericModal').classList.add('hidden');
+    </script>
+
+    <script>
+        // Protect route — all portal roles can access training workspace
+        checkAuth(['admin', 'teacherCoordinator', 'studentCoordinator']);
+
+        // Dynamic portal label and back-link
+        (function() {
+            const role = sessionStorage.getItem('userRole');
+            const backUrl = role === 'studentCoordinator' ? 'coordinator.html' : 'admin.html';
+            const brandLabel = role === 'studentCoordinator' ? 'Coordinator Portal'
+                             : role === 'teacherCoordinator' ? 'Teacher Portal'
+                             : 'Admin Portal';
+            const userName = sessionStorage.getItem('userName') || 'Admin';
+            const avatarChar = userName.charAt(0).toUpperCase();
+            const brandEl = document.getElementById('sidebarBrandLink');
+            const backEl  = document.getElementById('backToDashboardLink');
+            const welcomeEl = document.getElementById('welcomeUser');
+            const avatarEl = document.getElementById('userAvatarBadge');
+            if (brandEl)  { brandEl.href = backUrl; brandEl.textContent = brandLabel; }
+            if (backEl)   { backEl.href = backUrl; }
+            if (welcomeEl) welcomeEl.textContent = `Welcome, ${userName}`;
+            if (avatarEl)  avatarEl.textContent = avatarChar;
+        })();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const programId = urlParams.get('id');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const role = sessionStorage.getItem('userRole');
+            const fallbackUrl = role === 'studentCoordinator' ? 'coordinator.html' : 'admin.html';
+            if(!programId) { window.location.href = fallbackUrl; return; }
+            await db.ready;
+            renderPage();
+
+            // Tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(`${tab.dataset.tab}Tab`).classList.add('active');
+                    if(tab.dataset.tab === 'dashboard') renderDashboard();
+                    if(tab.dataset.tab === 'registrations') populateRegFilters();
+                    if(tab.dataset.tab === 'batches') renderBatchesTab();
+                    if(tab.dataset.tab === 'reports') renderReports();
+                });
+            });
+
+            document.getElementById('regDeptFilter').addEventListener('change', () => {
+                const p = getProg(); renderRegistrations(p);
+            });
+            document.getElementById('regBatchFilter').addEventListener('change', () => {
+                const p = getProg(); renderRegistrations(p);
+            });
+            document.getElementById('dashboardBatchFilter').addEventListener('change', () => {
+                renderDashboard();
+            });
+
+            // --- Batch management events ---
+            document.getElementById('addBatchBtn').addEventListener('click', () => {
+                const name = prompt('Enter batch name (e.g. Batch A):');
+                if (name && name.trim()) {
+                    const result = db.addTrainingBatch(programId, name.trim());
+                    alert(result.message);
+                    renderPage();
+                    renderBatchesTab();
+                }
+            });
+
+            document.getElementById('autoSplitMethod').addEventListener('change', () => {
+                const method = document.getElementById('autoSplitMethod').value;
+                const valueInput = document.getElementById('autoSplitValue');
+                const valueLabel = document.getElementById('autoSplitValueLabel');
+                const needsValue = (method === 'num_batches' || method === 'batch_size');
+                // Hide the numeric value field for grouping methods
+                valueInput.style.display = needsValue ? '' : 'none';
+                valueLabel.style.display = needsValue ? '' : 'none';
+                if (method === 'num_batches') valueLabel.textContent = 'Number of Batches';
+                else if (method === 'batch_size') valueLabel.textContent = 'Max Students per Batch';
+            });
+
+            document.getElementById('autoSplitBtn').addEventListener('click', () => {
+                const method = document.getElementById('autoSplitMethod').value;
+                const value = document.getElementById('autoSplitValue').value;
+                if(!confirm('This will overwrite all existing batch assignments. Continue?')) return;
+                const result = db.autoSplitTrainingBatches(programId, method, value);
+                alert(result.message);
+                renderPage();
+                renderBatchesTab();
+            });
+
+            document.getElementById('bulkAssignBtn').addEventListener('click', () => {
+                const batchId = document.getElementById('bulkBatchSelect').value;
+                if (!batchId) { alert('Please select a batch from the "Assign to Batch..." dropdown.'); return; }
+                const checked = Array.from(document.querySelectorAll('.reg-student-cb:checked')).map(cb => cb.value);
+                if (checked.length === 0) { alert('Please select at least one student using the checkboxes.'); return; }
+                const result = db.assignStudentsToBatch(programId, checked, batchId);
+                alert(result.message);
+                renderPage();
+            });
+
+            document.getElementById('removeFromBatchBtn').addEventListener('click', () => {
+                const checked = Array.from(document.querySelectorAll('.reg-student-cb:checked')).map(cb => cb.value);
+                if (checked.length === 0) { alert('Please select at least one student using the checkboxes.'); return; }
+                const result = db.assignStudentsToBatch(programId, checked, '');
+                alert(`Removed ${checked.length} student(s) from their batch.`);
+                renderPage();
+            });
+
+            document.getElementById('selectAllReg').addEventListener('change', (e) => {
+                document.querySelectorAll('.reg-student-cb').forEach(cb => cb.checked = e.target.checked);
+            });
+        });
+
+        function getProg() {
+            return db.getTrainingPrograms().find(p => p.id === programId);
+        }
+
+        function getBatchName(batches, regNo) {
+            const b = (batches || []).find(b => (b.students || []).includes(regNo));
+            return b ? `<span style="background:#e0edff;color:#0D6EFC;padding:2px 8px;border-radius:12px;font-size:0.78rem;font-weight:600;">${b.name}</span>` : `<span style="color:#aaa;font-size:0.78rem;">Unassigned</span>`;
+        }
+
+        function populateBatchDropdowns(batches) {
+            const opts = batches.map(b => `<option value="${b.id}">${b.name} (${(b.students||[]).length} students)</option>`).join('');
+            const filterOpts = '<option value="">All Batches</option>' + batches.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+            ['sessionBatchFilter','attnBatchFilter','regBatchFilter','dashboardBatchFilter'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.innerHTML = filterOpts;
+            });
+            const bulk = document.getElementById('bulkBatchSelect');
+            if(bulk) bulk.innerHTML = '<option value="">Assign to Batch...</option>' + opts;
+        }
+
+        function populateSessionBatchDropdown() {
+            const p = getProg();
+            const sel = document.getElementById('newSessionBatch');
+            sel.innerHTML = '<option value="">All Students</option>' + (p.batches||[]).map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+        }
+
+        function renderPage() {
+            const p = getProg();
+            if(!p) return;
+
+            document.getElementById('detName').textContent = p.name;
+            document.getElementById('detDesc').innerHTML = p.description || '';
+            document.getElementById('detVenue').textContent = p.venue;
+            document.getElementById('detDate').textContent = p.date;
+            const _days = (p.days && !isNaN(p.days) && Number(p.days) > 0)
+                ? Number(p.days)
+                : (p.date && p.endDate ? Math.max(1, Math.ceil((new Date(p.endDate) - new Date(p.date)) / 86400000) + 1) : 1);
+            document.getElementById('detDays').textContent = _days;
+            document.getElementById('detRegCount').textContent = p.registrations.length;
+
+            populateBatchDropdowns(p.batches || []);
+            renderRegistrations(p);
+            renderReviews(p);
+        }
+
+        function renderStudentAttendance(p) {
+            // Tab removed; guard if its container is gone
+            if (!document.getElementById('studentAttendanceTable')) return;
+            const students = db.getStudents();
+            const selectedBatch = document.getElementById('attnBatchFilter') ? document.getElementById('attnBatchFilter').value : '';
+            let regStudents = students.filter(s => p.registrations.includes(s.registerNumber));
+            
+            // Filter by batch if selected
+            if (selectedBatch) {
+                const batch = (p.batches||[]).find(b => b.id === selectedBatch);
+                if (batch) regStudents = regStudents.filter(s => (batch.students||[]).includes(s.registerNumber));
+            }
+
+            // Filter sessions by batch
+            let sessions = p.sessions;
+            if (selectedBatch) {
+                sessions = sessions.filter(s => !s.batchId || s.batchId === selectedBatch);
+            }
+
+            const thead = document.querySelector('#studentAttendanceTable thead');
+            const tbody = document.querySelector('#studentAttendanceTable tbody');
+            
+            let headersHtml = '<tr><th>Reg No</th><th>Name</th>';
+            sessions.forEach(s => {
+                const batchLabel = s.batchId ? ` <span style="font-size:0.7rem;background:#e0edff;color:#0D6EFC;padding:1px 5px;border-radius:8px;">${(p.batches||[]).find(b=>b.id===s.batchId)?.name||''}</span>` : '';
+                headersHtml += `<th style="min-width:90px;">${s.date}${batchLabel}<br><small>${s.time || ''}</small></th>`;
+            });
+            headersHtml += '</tr>';
+            thead.innerHTML = headersHtml;
+
+            tbody.innerHTML = '';
+            if (regStudents.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${2 + sessions.length}" class="text-center">No students found.</td></tr>`;
+                return;
+            }
+
+            regStudents.forEach(student => {
+                const tr = document.createElement('tr');
+                let rowHtml = `<td>${student.registerNumber}</td><td>${student.name}</td>`;
+                sessions.forEach(s => {
+                    const isPresent = (s.attendance || []).includes(student.registerNumber);
+                    rowHtml += isPresent
+                        ? `<td style="color:#10b981;font-weight:bold;">✓ Present</td>`
+                        : `<td style="color:#ef4444;font-weight:bold;">✗ Absent</td>`;
+                });
+                tr.innerHTML = rowHtml;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ---------- REPORTS ----------
+        function getCompletionThreshold() {
+            const el = document.getElementById('completionThreshold');
+            let v = el ? parseInt(el.value) : 75;
+            if (isNaN(v) || v < 1) v = 75;
+            if (v > 100) v = 100;
+            return v;
+        }
+
+        function computeReportRows(p) {
+            const students = db.getStudents();
+            const batches = p.batches || [];
+            const sessions = p.sessions || [];
+            const threshold = getCompletionThreshold();
+
+            const batchOf = (regNo) => {
+                const b = batches.find(b => (b.students || []).includes(regNo));
+                return b ? { id: b.id, name: b.name } : { id: '', name: 'Unassigned' };
+            };
+
+            return students
+                .filter(s => p.registrations.includes(s.registerNumber))
+                .map(s => {
+                    const bt = batchOf(s.registerNumber);
+                    const applicable = sessions.filter(se => !se.batchId || se.batchId === bt.id);
+                    const attended = applicable.filter(se => (se.attendance || []).includes(s.registerNumber)).length;
+                    const pct = applicable.length ? Math.round((attended / applicable.length) * 100) : 0;
+                    let status = 'In Progress';
+                    if (attended === 0) status = 'Not Attended';
+                    else if (pct >= threshold) status = 'Completed';
+                    return {
+                        regNo: s.registerNumber, name: s.name, cls: s.class || '—',
+                        dept: s.department || '', course: s.course || '', gender: s.gender || '',
+                        batchId: bt.id, batch: bt.name,
+                        total: applicable.length, attended, pct, status,
+                        score: (s.scores && s.scores[p.id] != null) ? s.scores[p.id] : null
+                    };
+                });
+        }
+
+        function renderReports() {
+            const p = getProg();
+            if (!p) return;
+            document.getElementById('repThreshold').textContent = getCompletionThreshold();
+            const rows = computeReportRows(p);
+
+            const registered = rows.length;
+            const attendedCount = rows.filter(r => r.attended > 0).length;
+            const completedCount = rows.filter(r => r.status === 'Completed').length;
+            const notAttended = rows.filter(r => r.attended === 0).length;
+            const batchCount = (p.batches || []).length;
+
+            const cards = [
+                { t: 'Registered', v: registered, c: '#1d4ed8' },
+                { t: 'Batches', v: batchCount, c: '#7c3aed' },
+                { t: 'Attended', v: attendedCount, c: '#16a34a' },
+                { t: 'Completed', v: completedCount, c: '#0891b2' },
+                { t: 'Not Attended', v: notAttended, c: '#dc2626' }
+            ];
+            document.getElementById('reportSummary').innerHTML = cards.map(c => `
+                <div class="stat-card" style="border-left:4px solid ${c.c};">
+                    <div class="stat-info">
+                        <span class="stat-value" style="color:${c.c};">${c.v}</span>
+                        <span class="stat-title">${c.t}</span>
+                    </div>
+                </div>`).join('');
+
+            // Batch-wise table
+            const batchGroups = {};
+            rows.forEach(r => {
+                const key = r.batch;
+                if (!batchGroups[key]) batchGroups[key] = [];
+                batchGroups[key].push(r);
+            });
+            const batchTbody = document.querySelector('#reportBatchTable tbody');
+            const batchKeys = Object.keys(batchGroups);
+            batchTbody.innerHTML = batchKeys.length ? batchKeys.map(k => {
+                const g = batchGroups[k];
+                const att = g.filter(r => r.attended > 0).length;
+                const comp = g.filter(r => r.status === 'Completed').length;
+                const avg = g.length ? Math.round(g.reduce((a, r) => a + r.pct, 0) / g.length) : 0;
+                return `<tr><td><strong>${k}</strong></td><td>${g.length}</td><td>${att}</td>
+                    <td>${g.length - att}</td><td>${comp}</td><td>${avg}%</td></tr>`;
+            }).join('') : '<tr><td colspan="6" class="text-center text-muted">No registered students.</td></tr>';
+
+            // Populate batch filter (preserve current selection)
+            const batchSel = document.getElementById('reportBatchFilter');
+            const prevBatch = batchSel.value;
+            batchSel.innerHTML = '<option value="">All Batches</option>' +
+                (p.batches || []).map(b => `<option value="${b.name}">${b.name}</option>`).join('') +
+                '<option value="Unassigned">Unassigned</option>';
+            batchSel.value = prevBatch;
+
+            // Student-wise table (with filters)
+            const filter = document.getElementById('reportStatusFilter').value;
+            const batchFilter = batchSel.value;
+            const threshold = getCompletionThreshold();
+            let view = rows.slice();
+            if (batchFilter) view = view.filter(r => r.batch === batchFilter);
+            if (filter === 'notattended') view = view.filter(r => r.attended === 0);
+            else if (filter === 'below') view = view.filter(r => r.pct < threshold);
+            else if (filter === 'completed') view = view.filter(r => r.status === 'Completed');
+
+            const pill = (st) => {
+                const map = { 'Completed': 'status-qualified', 'Not Attended': 'status-dropped', 'In Progress': 'status-pending' };
+                return `<span class="status-pill ${map[st] || ''}">${st}</span>`;
+            };
+            const stuTbody = document.querySelector('#reportStudentTable tbody');
+            stuTbody.innerHTML = view.length ? view.map(r => `
+                <tr ${r.attended === 0 ? 'style="background:#fff5f5;"' : ''}>
+                    <td>${r.regNo}</td><td>${r.name}</td><td>${r.cls}</td><td>${r.batch}</td>
+                    <td>${r.attended} / ${r.total}</td><td><strong>${r.pct}%</strong></td><td>${pill(r.status)}</td>
+                </tr>`).join('') : '<tr><td colspan="7" class="text-center text-muted">No students match this filter.</td></tr>';
+        }
+
+        window.renderReports = renderReports;
+
+        window.exportReportExcel = function () {
+            const p = getProg();
+            if (!p) return;
+            const rows = computeReportRows(p);
+            const threshold = getCompletionThreshold();
+
+            const studentSheet = rows.map(r => ({
+                'Reg No': r.regNo, 'Name': r.name, 'Class': r.cls, 'Department': r.dept,
+                'Gender': r.gender, 'Batch': r.batch, 'Sessions Attended': r.attended,
+                'Total Sessions': r.total, 'Attendance %': r.pct, 'Status': r.status
+            }));
+
+            const batchGroups = {};
+            rows.forEach(r => { (batchGroups[r.batch] = batchGroups[r.batch] || []).push(r); });
+            const batchSheet = Object.keys(batchGroups).map(k => {
+                const g = batchGroups[k];
+                const att = g.filter(r => r.attended > 0).length;
+                return {
+                    'Batch': k, 'Students': g.length, 'Attended': att, 'Not Attended': g.length - att,
+                    'Completed': g.filter(r => r.status === 'Completed').length,
+                    'Avg Attendance %': g.length ? Math.round(g.reduce((a, r) => a + r.pct, 0) / g.length) : 0
+                };
+            });
+
+            const summarySheet = [
+                { Metric: 'Program', Value: p.name },
+                { Metric: 'Completion Threshold %', Value: threshold },
+                { Metric: 'Registered', Value: rows.length },
+                { Metric: 'Batches', Value: (p.batches || []).length },
+                { Metric: 'Attended', Value: rows.filter(r => r.attended > 0).length },
+                { Metric: 'Completed', Value: rows.filter(r => r.status === 'Completed').length },
+                { Metric: 'Not Attended', Value: rows.filter(r => r.attended === 0).length }
+            ];
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summarySheet), 'Summary');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(batchSheet), 'By Batch');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(studentSheet), 'Students');
+            const safeName = (p.name || 'Training').replace(/[^a-z0-9]/gi, '_');
+            XLSX.writeFile(wb, `${safeName}_Report.xlsx`);
+        };
+
+        function renderSessions(p) {
+            const list = document.getElementById('sessionsList');
+            if (!list) return;
+            list.innerHTML = '';
+
+            const filterBatch = document.getElementById('sessionBatchFilter') ? document.getElementById('sessionBatchFilter').value : '';
+            let sessions = p.sessions;
+            if (filterBatch) {
+                sessions = sessions.filter(s => s.batchId === filterBatch);
+            }
+
+            if(sessions.length === 0) {
+                list.innerHTML = '<p class="text-muted">No sessions found.</p>';
+                return;
+            }
+
+            sessions.forEach(s => {
+                const batchName = s.batchId ? ((p.batches||[]).find(b=>b.id===s.batchId)?.name || 'Unknown Batch') : 'All Students';
+                const batchBadgeColor = s.batchId ? '#0D6EFC' : '#6c757d';
+                const card = document.createElement('div');
+                card.className = 'glass-card';
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="mb-1">Session: ${s.date}</h5>
+                            <span style="background:${batchBadgeColor}15;color:${batchBadgeColor};padding:2px 10px;border-radius:12px;font-size:0.78rem;font-weight:600;border:1px solid ${batchBadgeColor}30;">👥 ${batchName}</span>
+                        </div>
+                        <div class="d-flex gap-2 align-items-center">
+                            <span class="badge bg-primary">${s.time || 'TBD'}</span>
+                            <button class="btn btn-secondary btn-sm" onclick="openEditSessionModal('${s.id}', '${s.date}', '${s.time || ''}', '${s.batchId || ''}')" title="Edit Session">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                                Edit
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="confirmDeleteSession('${s.id}', '${s.date}')" title="Delete Session">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="white"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded" style="border: 1px dashed #cbd5e1;">
+                        <div>
+                            <span class="text-muted small d-block">Total Present</span>
+                            <strong class="text-primary" style="font-size: 1.1rem;">${(s.attendance || []).length} Students</strong>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-success btn-sm" onclick="openManualAttnModal('${s.id}', '${s.date}', '${s.batchId || ''}')">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="me-1"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                                Mark Attendance
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="openAttnModal('${s.id}', '${s.date}')">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" class="me-1"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
+                                Upload Excel
+                            </button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        function renderRegistrations(p) {
+            const students = db.getStudents();
+            const filterDept = document.getElementById('regDeptFilter').value;
+            const filterBatch = document.getElementById('regBatchFilter') ? document.getElementById('regBatchFilter').value : '';
+
+            // Overview cards
+            const ov = document.getElementById('regOverview');
+            if (ov) {
+                const batches = p.batches || [];
+                const assignedSet = new Set();
+                batches.forEach(b => (b.students || []).forEach(r => assignedSet.add(r)));
+                const assigned = p.registrations.filter(r => assignedSet.has(r)).length;
+                const cards = [
+                    { t: 'Registered', v: p.registrations.length, c: '#1d4ed8' },
+                    { t: 'Batches', v: batches.length, c: '#7c3aed' },
+                    { t: 'Assigned', v: assigned, c: '#16a34a' },
+                    { t: 'Not Assigned', v: p.registrations.length - assigned, c: '#dc2626' }
+                ];
+                ov.innerHTML = cards.map(c => `
+                    <div class="stat-card" style="border-left:4px solid ${c.c};">
+                        <div class="stat-info">
+                            <span class="stat-value" style="color:${c.c};">${c.v}</span>
+                            <span class="stat-title">${c.t}</span>
+                        </div>
+                    </div>`).join('');
+            }
+
+            let regStudents = students.filter(s => p.registrations.includes(s.registerNumber));
+            if (filterDept) regStudents = regStudents.filter(s => s.department === filterDept);
+            if (filterBatch) {
+                const batch = (p.batches||[]).find(b => b.id === filterBatch);
+                if (batch) regStudents = regStudents.filter(s => (batch.students||[]).includes(s.registerNumber));
+            }
+
+            const tbody = document.querySelector('#regTable tbody');
+            tbody.innerHTML = '';
+            if (regStudents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No students found.</td></tr>';
+                return;
+            }
+            regStudents.forEach(s => {
+                tbody.innerHTML += `<tr>
+                    <td><input type="checkbox" class="reg-student-cb" value="${s.registerNumber}" style="width:16px;height:16px;"></td>
+                    <td>${s.registerNumber}</td>
+                    <td>${s.name}</td>
+                    <td>${s.department}</td>
+                    <td>${s.course}</td>
+                    <td>${getBatchName(p.batches, s.registerNumber)}</td>
+                </tr>`;
+            });
+        }
+
+        function populateRegFilters() {
+            const p = getProg();
+            const students = db.getStudents();
+            const regStudents = students.filter(s => p.registrations.includes(s.registerNumber));
+            const depts = [...new Set(regStudents.map(s => s.department))].sort();
+            const select = document.getElementById('regDeptFilter');
+            const current = select.value;
+            select.innerHTML = '<option value="">All Departments</option>' + 
+                depts.map(d => `<option value="${d}" ${d === current ? 'selected' : ''}>${d}</option>`).join('');
+        }
+
+        function renderReviews(p) {
+            const list = document.getElementById('reviewsList');
+            const students = db.getStudents();
+            list.innerHTML = '';
+
+            if (!p.feedbacks || p.feedbacks.length === 0) {
+                list.innerHTML = '<p class="text-muted">No reviews submitted yet.</p>';
+                return;
+            }
+
+            p.feedbacks.forEach(f => {
+                const student = students.find(s => s.registerNumber === f.regNo) || { name: 'Unknown Student' };
+                const card = document.createElement('div');
+                card.className = 'p-3 bg-light rounded';
+                card.style.borderLeft = '4px solid #ffc107';
+                
+                let stars = '';
+                for (let i = 1; i <= 5; i++) {
+                    stars += `<span style="color: ${i <= f.rating ? '#ffc107' : '#ddd'}; font-size: 1.2rem;">★</span>`;
+                }
+
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <strong>${student.name}</strong> <small class="text-muted">(${f.regNo})</small>
+                        </div>
+                        <div>${stars}</div>
+                    </div>
+                    <p class="mb-0" style="font-style: italic; color: #4b5563;">"${f.comment || 'No comment provided.'}"</p>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        let activeSessionId = null;
+        let activeType = null;
+        let editingSessionId = null;
+
+        window.openAttnModal = (sid, date) => {
+            activeSessionId = sid;
+            document.getElementById('attnModalTitle').textContent = `Upload Session Attendance`;
+            document.getElementById('attnModalSubtitle').textContent = `Session Date: ${date}`;
+            document.getElementById('attnModal').classList.remove('hidden');
+        };
+
+        window.confirmDeleteSession = (sid, date) => {
+            if (confirm(`Are you sure you want to delete the session on ${date}? This will also remove all attendance records for this session.`)) {
+                db.deleteSession(programId, sid);
+                renderPage();
+            }
+        };
+
+        window.openEditSessionModal = (sid, date, time, batchId) => {
+            editingSessionId = sid;
+            document.getElementById('editSessionDate').value = date;
+            if (time) {
+                try {
+                    const [t, period] = time.split(' ');
+                    let [h, m] = t.split(':');
+                    h = parseInt(h);
+                    if (period === 'PM' && h !== 12) h += 12;
+                    if (period === 'AM' && h === 12) h = 0;
+                    document.getElementById('editSessionTime').value = `${String(h).padStart(2,'0')}:${m}`;
+                } catch(e) {
+                    document.getElementById('editSessionTime').value = time;
+                }
+            }
+            // Populate edit batch dropdown
+            const p = getProg();
+            const editBatchSel = document.getElementById('editSessionBatch');
+            if (editBatchSel) {
+                editBatchSel.innerHTML = '<option value="">All Students</option>' + (p.batches||[]).map(b => `<option value="${b.id}" ${b.id===batchId?'selected':''}>${b.name}</option>`).join('');
+            }
+            document.getElementById('editSessionModal').classList.remove('hidden');
+        };
+
+        document.getElementById('saveEditSessionBtn').addEventListener('click', () => {
+            const newDate = document.getElementById('editSessionDate').value;
+            const newTimeRaw = document.getElementById('editSessionTime').value;
+            const newBatchId = document.getElementById('editSessionBatch') ? document.getElementById('editSessionBatch').value : '';
+            if (!newDate || !newTimeRaw) { alert('Please fill in both date and time.'); return; }
+            const [h, m] = newTimeRaw.split(':');
+            const hour = parseInt(h);
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const hour12 = hour % 12 || 12;
+            const formattedTime = `${hour12}:${m} ${period}`;
+            db.updateSession(programId, editingSessionId, newDate, formattedTime, newBatchId);
+            document.getElementById('editSessionModal').classList.add('hidden');
+            renderPage();
+        });
+
+        document.getElementById('confirmAttnUpload').addEventListener('click', () => {
+            const file = document.getElementById('attnFile').files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                
+                const regNumbers = jsonData.map(row => String(row['Register Number'] || row['Reg No'] || '').trim()).filter(r => r);
+                const result = db.updateSessionAttendance(programId, activeSessionId, regNumbers);
+                
+                alert(result.message);
+                document.getElementById('attnModal').classList.add('hidden');
+                document.getElementById('attnFile').value = '';
+                renderPage();
+                renderBatchesTab();
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        let activeManualSessionId = null;
+
+        window.openManualAttnModal = (sid, date, batchId) => {
+            activeManualSessionId = sid;
+            document.getElementById('manualAttnModalSubtitle').textContent = `Session Date: ${date}`;
+            
+            const p = getProg();
+            const session = p.sessions.find(s => s.id === sid);
+            const attendedRegNos = session ? (session.attendance || []) : [];
+
+            const students = db.getStudents();
+            let regStudents = students.filter(s => p.registrations.includes(s.registerNumber));
+
+            // If session is for a specific batch, only show students from that batch
+            if (batchId) {
+                const batch = (p.batches||[]).find(b => b.id === batchId);
+                if (batch) {
+                    regStudents = regStudents.filter(s => (batch.students||[]).includes(s.registerNumber));
+                    document.getElementById('manualAttnModalTitle').textContent = `Mark Attendance — ${batch.name}`;
+                } else {
+                    document.getElementById('manualAttnModalTitle').textContent = 'Mark Attendance';
+                }
+            } else {
+                document.getElementById('manualAttnModalTitle').textContent = 'Mark Attendance';
+            }
+            
+            const tbody = document.querySelector('#manualAttnTable tbody');
+            tbody.innerHTML = '';
+            
+            if(regStudents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">No students in this batch or registered.</td></tr>';
+            } else {
+                regStudents.forEach(s => {
+                    const isChecked = attendedRegNos.includes(s.registerNumber) ? 'checked' : '';
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${s.registerNumber}</td>
+                            <td>${s.name}</td>
+                            <td>${s.course}</td>
+                            <td class="text-center">
+                                <input type="checkbox" class="manual-attn-cb form-check-input" value="${s.registerNumber}" ${isChecked} style="width: 18px; height: 18px; cursor: pointer;">
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            document.getElementById('manualAttnModal').classList.remove('hidden');
+        };
+
+        document.getElementById('selectAllAttnBtn').addEventListener('click', () => {
+            document.querySelectorAll('.manual-attn-cb').forEach(cb => cb.checked = true);
+        });
+        
+        document.getElementById('deselectAllAttnBtn').addEventListener('click', () => {
+            document.querySelectorAll('.manual-attn-cb').forEach(cb => cb.checked = false);
+        });
+
+        document.getElementById('saveManualAttnBtn').addEventListener('click', () => {
+            const checkboxes = document.querySelectorAll('.manual-attn-cb:checked');
+            const regNumbers = Array.from(checkboxes).map(cb => cb.value);
+            
+            const result = db.updateSessionAttendance(programId, activeManualSessionId, regNumbers);
+            alert(result.message);
+            document.getElementById('manualAttnModal').classList.add('hidden');
+            renderPage();
+            renderBatchesTab();
+        });
+
+        function renderDashboard() {
+            const p = getProg();
+            const students = db.getStudents();
+            if(!p) return;
+
+            const selectedBatch = document.getElementById('dashboardBatchFilter') ? document.getElementById('dashboardBatchFilter').value : '';
+
+            let regStudents = students.filter(s => p.registrations.includes(s.registerNumber));
+            let sessions = p.sessions;
+
+            if (selectedBatch) {
+                const batch = (p.batches||[]).find(b => b.id === selectedBatch);
+                if (batch) regStudents = regStudents.filter(s => (batch.students||[]).includes(s.registerNumber));
+                sessions = sessions.filter(s => !s.batchId || s.batchId === selectedBatch);
+            }
+
+            const attendedRegNos = new Set();
+            sessions.forEach(s => { (s.attendance || []).forEach(r => attendedRegNos.add(r)); });
+
+            const attendedStudents = regStudents.filter(s => attendedRegNos.has(s.registerNumber));
+            const notAttendedCount = regStudents.length - attendedStudents.length;
+
+            const males = attendedStudents.filter(s => s.gender === 'Male');
+            const females = attendedStudents.filter(s => s.gender === 'Female');
+            document.getElementById('cardAttendedMale').textContent = males.length;
+            document.getElementById('cardAttendedFemale').textContent = females.length;
+            document.getElementById('cardNotAttended').textContent = notAttendedCount;
+
+            const depts = [...new Set(regStudents.map(s => s.department))];
+            const deptAttnData = depts.map(d => attendedStudents.filter(s => s.department === d).length);
+            const deptRegData = depts.map(d => regStudents.filter(s => s.department === d).length);
+
+            const sessionLabels = sessions.map(s => {
+                const batchLabel = s.batchId ? ` (${(p.batches||[]).find(b=>b.id===s.batchId)?.name||''})` : '';
+                return s.date + batchLabel;
+            });
+            const sessionData = sessions.map(s => (s.attendance || []).length);
+            
+            const ratingCounts = [0,0,0,0,0];
+            (p.feedbacks || []).forEach(f => { ratingCounts[f.rating - 1]++; });
+
+            initCharts(depts, deptAttnData, deptRegData, males.length, females.length, sessionLabels, sessionData, ratingCounts);
+        }
+
+        function renderBatchesTab() {
+            const p = getProg();
+            const list = document.getElementById('batchesList');
+            list.innerHTML = '';
+
+            if (!p.batches || p.batches.length === 0) {
+                list.innerHTML = '<p class="text-muted">No batches created yet. Use "+ New Batch" or "Auto Split" to get started.</p>';
+                return;
+            }
+
+            const rows = computeReportRows(p);
+            const byBatch = {};
+            rows.forEach(r => { (byBatch[r.batchId] = byBatch[r.batchId] || []).push(r); });
+
+            p.batches.forEach(batch => {
+                const brows = byBatch[batch.id] || [];
+                const attended = brows.filter(r => r.attended > 0).length;
+                const notAttended = brows.length - attended;
+                const avgPct = brows.length ? Math.round(brows.reduce((a, r) => a + r.pct, 0) / brows.length) : 0;
+                const batchSessions = (p.sessions || []).filter(s => s.batchId === batch.id);
+
+                const sessionRows = batchSessions.length === 0
+                    ? '<p class="text-muted small" style="margin:0.5rem 0;">No sessions yet for this batch.</p>'
+                    : batchSessions.map(s => {
+                        const present = (s.attendance || []).length;
+                        const pct = brows.length ? Math.round(present / brows.length * 100) : 0;
+                        return `<div class="d-flex justify-content-between align-items-center" style="padding:0.5rem 0.75rem;border:1px solid #eef2f7;border-radius:8px;margin-bottom:0.4rem;">
+                            <div><strong>${s.date}</strong> <span class="text-muted small">${s.time || ''}</span>${s.venue ? ` · <span class="text-muted small">📍 ${s.venue}</span>` : ''}</div>
+                            <div class="d-flex gap-2 align-items-center">
+                                <span class="badge bg-primary">${present}/${brows.length} (${pct}%)</span>
+                                <button class="btn btn-success btn-sm" onclick="openManualAttnModal('${s.id}', '${s.date}', '${batch.id}')">Mark</button>
+                                <button class="btn btn-secondary btn-sm" onclick="openAttnModal('${s.id}', '${s.date}')" title="Upload attendance via Excel">Excel</button>
+                                <button class="btn btn-danger btn-sm" onclick="confirmDeleteSession('${s.id}', '${s.date}')">✕</button>
+                            </div>
+                        </div>`;
+                    }).join('');
+
+                const card = document.createElement('div');
+                card.className = 'glass-card';
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center" style="flex-wrap:wrap; gap:0.5rem;">
+                        <div>
+                            <h6 style="margin:0;color:var(--accent);font-size:1rem;">${batch.name}</h6>
+                            <small class="text-muted">${brows.length} student(s) · ${attended} attended · ${notAttended} not attended · ${avgPct}% avg</small>
+                        </div>
+                        <div class="d-flex gap-2" style="flex-wrap:wrap;">
+                            <button class="btn btn-primary btn-sm" onclick="showBatchDetails('${batch.id}')">Details</button>
+                            <button class="btn btn-secondary btn-sm" onclick="showBatchNotAttended('${batch.id}')">Not Attended (${notAttended})</button>
+                            <button class="btn btn-secondary btn-sm" onclick="toggleBatchSessions('${batch.id}')">▾ Sessions</button>
+                            <button class="btn btn-secondary btn-sm" onclick="renameBatch('${batch.id}', '${batch.name.replace(/'/g, '')}')">Rename</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteBatch('${batch.id}', '${batch.name.replace(/'/g, '')}')">Delete</button>
+                        </div>
+                    </div>
+                    <div id="batchSessions_${batch.id}" class="hidden" style="margin-top:1rem;border-top:1px dashed #e2e8f0;padding-top:1rem;">
+                        <div class="d-flex gap-2 align-items-end mb-3" style="flex-wrap:wrap;">
+                            <div class="form-group mb-0"><label class="form-label">Date</label><input type="date" id="bsDate_${batch.id}" class="form-control" style="min-width:150px;"></div>
+                            <div class="form-group mb-0"><label class="form-label">Time</label><input type="time" id="bsTime_${batch.id}" class="form-control" style="min-width:120px;"></div>
+                            <div class="form-group mb-0"><label class="form-label">Venue</label><input type="text" id="bsVenue_${batch.id}" class="form-control" placeholder="Venue" style="min-width:150px;"></div>
+                            <button class="btn btn-primary btn-sm" style="height:38px;" onclick="addBatchSession('${batch.id}')">+ Add Session</button>
+                        </div>
+                        <div>${sessionRows}</div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+
+            const unassigned = p.registrations.filter(regNo => !p.batches.some(b => (b.students || []).includes(regNo)));
+            if (unassigned.length > 0) {
+                const warn = document.createElement('div');
+                warn.style.cssText = 'background:#fff8e1;border:1px solid #ffc107;border-radius:10px;padding:0.8rem 1rem;margin-top:0.5rem;';
+                warn.innerHTML = `<strong>⚠️ ${unassigned.length} student(s) not assigned to any batch:</strong><div style="margin-top:0.4rem;font-size:0.83rem;color:#555;">${unassigned.join(', ')}</div>`;
+                list.appendChild(warn);
+            }
+        }
+
+        window.toggleBatchSessions = (batchId) => {
+            const el = document.getElementById('batchSessions_' + batchId);
+            if (el) el.classList.toggle('hidden');
+        };
+
+        window.addBatchSession = (batchId) => {
+            const date = document.getElementById('bsDate_' + batchId).value;
+            const time = document.getElementById('bsTime_' + batchId).value;
+            const venue = document.getElementById('bsVenue_' + batchId).value;
+            if (!date) { alert('Please choose a date.'); return; }
+            const res = db.addTrainingSession(programId, date, time, batchId, venue);
+            if (!res.success) { alert(res.message); return; }
+            renderPage();
+            renderBatchesTab();
+            document.getElementById('batchSessions_' + batchId)?.classList.remove('hidden');
+        };
+
+        window.showBatchDetails = (batchId) => {
+            const p = getProg();
+            const batch = (p.batches || []).find(b => b.id === batchId);
+            if (!batch) return;
+            const rows = computeReportRows(p).filter(r => r.batchId === batchId);
+            const otherBatches = (p.batches || []).filter(b => b.id !== batchId);
+            const body = rows.length ? rows.map(r => `
+                <tr>
+                    <td>${r.regNo}</td><td>${r.name}</td><td>${r.course}</td>
+                    <td><strong>${r.pct}%</strong> <span class="text-muted small">(${r.attended}/${r.total})</span></td>
+                    <td>${r.score != null ? r.score : '—'}</td>
+                    <td>
+                        <select class="form-control" style="padding:0.3rem 0.5rem;font-size:0.8rem;" onchange="transferStudent('${r.regNo}', this.value, '${batchId}')">
+                            <option value="">Transfer to…</option>
+                            ${otherBatches.map(b => `<option value="${b.id}">${b.name}</option>`).join('')}
+                            <option value="__none__">Unassign</option>
+                        </select>
+                    </td>
+                </tr>`).join('') : '<tr><td colspan="6" class="text-center text-muted">No students in this batch.</td></tr>';
+            openGenericModal(`Batch: ${batch.name}`, `
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead><tr><th>Reg No</th><th>Name</th><th>Course</th><th>Attendance</th><th>Score</th><th>Transfer</th></tr></thead>
+                        <tbody>${body}</tbody>
+                    </table>
+                </div>`);
+        };
+
+        window.showBatchNotAttended = (batchId) => {
+            const p = getProg();
+            const batch = (p.batches || []).find(b => b.id === batchId);
+            if (!batch) return;
+            const rows = computeReportRows(p).filter(r => r.batchId === batchId && r.attended === 0);
+            const body = rows.length ? rows.map(r => `<tr><td>${r.regNo}</td><td>${r.name}</td><td>${r.course}</td></tr>`).join('')
+                : '<tr><td colspan="3" class="text-center text-muted">Everyone has attended at least one session. 🎉</td></tr>';
+            openGenericModal(`Not Attended — ${batch.name}`, `
+                <div class="table-responsive"><table class="table">
+                    <thead><tr><th>Reg No</th><th>Name</th><th>Course</th></tr></thead>
+                    <tbody>${body}</tbody>
+                </table></div>`);
+        };
+
+        window.transferStudent = (regNo, newBatchId, fromBatchId) => {
+            if (!newBatchId) return;
+            const target = newBatchId === '__none__' ? '' : newBatchId;
+            const res = db.assignStudentsToBatch(programId, [regNo], target);
+            renderPage();
+            renderBatchesTab();
+            closeGenericModal();
+        };
+
+        window.renameBatch = (batchId, currentName) => {
+            const newName = prompt('Enter new batch name:', currentName);
+            if (newName && newName.trim() && newName.trim() !== currentName) {
+                const p = getProg();
+                const idx = db.cache.trainingPrograms.findIndex(x => x.id === programId);
+                if (idx !== -1) {
+                    const prog = db.cache.trainingPrograms[idx];
+                    prog.batches = prog.batches || [];
+                    const b = prog.batches.find(b => b.id === batchId);
+                    if (b) { b.name = newName.trim(); db.sync('Training Program', prog); }
+                }
+                renderPage();
+                renderBatchesTab();
+            }
+        };
+
+        window.deleteBatch = (batchId, batchName) => {
+            if (confirm(`Delete batch "${batchName}"? Students will be unassigned.`)) {
+                const result = db.deleteTrainingBatch(programId, batchId);
+                alert(result.message);
+                renderPage();
+                renderBatchesTab();
+            }
+        };
+
+        let charts = {};
+        function initCharts(depts, deptAttnData, deptRegData, males, females, sessionLabels, sessionData, ratingCounts) {
+            // Destroy existing charts if any
+            Object.values(charts).forEach(c => c.destroy());
+
+            // Gender Pie
+            charts.gender = new Chart(document.getElementById('chartGender'), {
+                type: 'pie',
+                data: {
+                    labels: ['Male', 'Female'],
+                    datasets: [{
+                        data: [males, females],
+                        backgroundColor: ['#000080', '#6f42c1']
+                    }]
+                }
+            });
+
+            // Dept Attendance
+            charts.dept = new Chart(document.getElementById('chartDept'), {
+                type: 'bar',
+                data: {
+                    labels: depts,
+                    datasets: [{
+                        label: 'Attended Students',
+                        data: deptAttnData,
+                        backgroundColor: '#0D6EFC'
+                    }]
+                }
+            });
+
+            // Reg vs Attn Clustered
+            charts.regVsAttn = new Chart(document.getElementById('chartRegVsAttn'), {
+                type: 'bar',
+                data: {
+                    labels: depts,
+                    datasets: [
+                        { label: 'Registered', data: deptRegData, backgroundColor: '#e5e7eb' },
+                        { label: 'Attended', data: deptAttnData, backgroundColor: '#000080' }
+                    ]
+                }
+            });
+
+            // Session Wise
+            charts.session = new Chart(document.getElementById('chartSession'), {
+                type: 'bar',
+                data: {
+                    labels: sessionLabels,
+                    datasets: [
+                        { label: 'Attendance', data: sessionData, backgroundColor: '#0D6EFC' }
+                    ]
+                }
+            });
+
+            // Ratings
+            charts.rating = new Chart(document.getElementById('chartRating'), {
+                type: 'bar',
+                data: {
+                    labels: ['1 Star', '2 Star', '3 Star', '4 Star', '5 Star'],
+                    datasets: [{
+                        label: 'Total Reviews',
+                        data: ratingCounts,
+                        backgroundColor: '#ffc107'
+                    }]
+                }
+            });
+        }
+
+        document.getElementById('downloadAttnTemplate').addEventListener('click', () => {
+            const wsData = [
+                ["Register Number"],
+                ["REG001"],
+                ["REG002"]
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Attendance Template");
+            XLSX.writeFile(wb, "Attendance_Template.xlsx");
+        });
+    </script>
+    <style>
+        .badge { padding: 0.25rem 0.5rem; border-radius: 8px; font-size: 0.75rem; color: white; }
+        .bg-success { background: #198754; }
+        .bg-secondary { background: #6c757d; }
+        .bg-light { background: #f8f9fa; }
+    </style>
+</body>
+</html>

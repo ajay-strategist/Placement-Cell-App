@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Christ College Placement Cell</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="premium-ui">
+    <div class="login-wrapper">
+        <div class="glass-card login-card text-center">
+            <div class="college-logo-placeholder">CC</div>
+            <h2>Placement Cell</h2>
+            <p class="text-muted mb-4">Christ College Placement Management</p>
+
+            <div class="login-tabs">
+                <button type="button" class="login-tab active" data-role="student">Student</button>
+                <button type="button" class="login-tab" data-role="studentCoordinator">Student Coordinator</button>
+                <button type="button" class="login-tab" data-role="teacherCoordinator">Teacher Coordinator</button>
+                <button type="button" class="login-tab" data-role="admin">Admin</button>
+            </div>
+
+            <div id="loginAlert" class="alert hidden"></div>
+
+            <form id="loginForm">
+                <input type="hidden" id="role" value="student">
+                <div class="form-group">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="Admin / Reg No / Phone No" required>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter Password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-2">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/db.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

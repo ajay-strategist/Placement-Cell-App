@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Placement Cell</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="premium-ui">
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="college-logo-placeholder" style="margin-bottom: 1rem;">CC</div>
+            <a href="#" class="sidebar-brand">Student Portal</a>
+            <ul class="sidebar-nav">
+                <li><a class="sidebar-link tab active" data-tab="training">Training Programs</a></li>
+                <li><a class="sidebar-link tab" data-tab="placement">Placement Activities</a></li>
+
+                <li><a class="sidebar-link tab" data-tab="attendance">Program Details</a></li>
+                <li><a class="sidebar-link tab" data-tab="exams">My Exams</a></li>
+                <li class="mt-4"><a href="#" onclick="openStudentProfile()" class="sidebar-link" style="background: rgba(255,255,255,0.05); border-radius: 10px; display: flex; align-items: center; padding: 10px 15px;"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="margin-right: 10px;"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> My Profile</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" onclick="logout()" class="btn btn-danger w-100" style="padding: 0.5rem 1rem; font-size: 13px; border: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+                    Logout
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content" style="padding: 0;">
+            <div class="top-header">
+                <div>
+                    <div class="breadcrumb">Portal / Student Profile</div>
+                    <h1 class="page-title" id="studentName">Welcome, Student</h1>
+                </div>
+                <div class="user-profile" onclick="openStudentProfile()" style="cursor: pointer;">
+                    <div class="user-info" style="text-align: right;">
+                        <span class="user-role">Student Portal</span>
+                    </div>
+                    <div class="user-avatar" id="headerAvatar">S</div>
+                </div>
+            </div>
+
+            <div class="content-body">
+                <!-- Profile Tab -->
+                <!-- Profile Modal -->
+                <div id="studentProfileModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1001; backdrop-filter: blur(10px);">
+                    <div class="glass-card" style="width: 400px; max-width: 95vw; background: white; padding: 0; overflow: hidden; border-radius: 20px;">
+                        <div style="background: linear-gradient(135deg, #0a0f1c 0%, #0352c9 100%); padding: 2rem; color: white; text-align: center;">
+                            <div id="pModalAvatar" style="width: 80px; height: 80px; border-radius: 50%; background: white; color: #0352c9; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; margin: 0 auto 1rem; border: 4px solid rgba(255,255,255,0.2);">S</div>
+                            <h4 id="pModalStudentName" style="margin: 0; font-weight: 800;">Student Name</h4>
+                            <p id="pModalRegNo" style="opacity: 0.8; font-size: 0.9rem; margin-top: 0.25rem;"></p>
+                        </div>
+                        <div style="padding: 1.5rem;">
+                            <div class="mb-3">
+                                <label class="small text-muted fw-bold" style="font-size: 10px;">DEPARTMENT</label>
+                                <div id="pModalDept" style="font-weight: 600; color: #111827;"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small text-muted fw-bold" style="font-size: 10px;">CONTACT DETAILS</label>
+                                <div style="font-weight: 600; color: #111827;"><span id="pModalPhone"></span></div>
+                                <div style="font-weight: 600; color: #111827; font-size: 0.9rem;"><span id="pModalEmail"></span></div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="small text-muted fw-bold" style="font-size: 10px;">GENDER</label>
+                                <div id="pModalGender" style="font-weight: 600; color: #111827;"></div>
+                            </div>
+                            <button class="btn btn-secondary w-100" onclick="document.getElementById('studentProfileModal').classList.add('hidden')" style="padding: 0.75rem; border-radius: 12px; font-weight: 700;">Close Profile</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-body">
+                    <!-- Dashboard Placeholder (was Profile) -->
+                    <div id="profileTab" class="tab-content active">
+                        <div class="alert alert-primary d-flex align-items-center gap-3" style="border-radius: 16px; padding: 2rem;">
+                            <div style="font-size: 2rem;">👋</div>
+                            <div>
+                                <h4 class="mb-1" style="font-weight: 800;">Welcome back!</h4>
+                                <p class="mb-0">Select a tab from the sidebar to manage your trainings and placement activities.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                <!-- Training Tab -->
+                <div id="trainingTab" class="tab-content">
+                    <h4 class="mb-4">Training & Programs</h4>
+                    <div id="trainingList" class="d-flex flex-column gap-3 w-100">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Program Details Tab -->
+                <div id="attendanceTab" class="tab-content">
+                    <h4 class="mb-4">My Training Program Details</h4>
+                    <div id="attendanceRecord">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+                <!-- My Exams Tab -->
+                <div id="examsTab" class="tab-content">
+                    <h4 class="mb-4">My Exams</h4>
+                    <div id="examsList"></div>
+                </div>
+                <!-- Placement Tab -->
+                <div id="placementTab" class="tab-content">
+                    <h4 class="mb-4">Placement & Recruitment Drives</h4>
+                    <div id="placementList" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+            </div> <!-- content-body -->
+        </main>
+    </div>
+
+    <!-- Placement Details Modal -->
+    <div id="placementDetailsModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 999; backdrop-filter: blur(10px);">
+        <div class="glass-card" style="width: 700px; max-width: 95vw; background: white; padding: 0; overflow: hidden; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);">
+            <!-- Modal Header -->
+            <div id="pModalHeader" style="padding: 2.5rem 2rem; color: white; position: relative;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <span id="pModalType" class="badge" style="background: rgba(255,255,255,0.2); color: white; font-size: 10px; margin-bottom: 0.75rem; border: 1px solid rgba(255,255,255,0.3); text-transform: uppercase; font-weight: 700; display: inline-block;"></span>
+                        <h2 id="pModalName" style="margin: 0; font-size: 1.75rem; font-weight: 800; color: white;"></h2>
+                    </div>
+                    <button class="btn" onclick="document.getElementById('placementDetailsModal').classList.add('hidden')" style="background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; padding: 0;">✕</button>
+                </div>
+            </div>
+            <!-- Modal Body -->
+            <div style="padding: 2rem; max-height: 75vh; overflow-y: auto;">
+                <div class="mb-4">
+                    <h6 class="small text-muted mb-2 fw-bold" style="font-size: 10px; letter-spacing: 1px;">DESCRIPTION</h6>
+                    <p id="pModalDesc" style="color: #4b5563; line-height: 1.6; font-size: 1rem;"></p>
+                </div>
+                <div class="d-flex gap-4 mb-4 pt-3 border-top" style="border-color: #f3f4f6;">
+                    <div class="d-flex align-items-center gap-2 text-muted" style="font-size: 0.85rem;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        <span id="pModalVenue" style="font-weight: 600;"></span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 text-muted" style="font-size: 0.85rem;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/></svg>
+                        <span style="font-weight: 600;">Posted: <span id="pModalDate" style="color: #111827;"></span></span>
+                    </div>
+                </div>
+                <div id="pModalProgress" class="mt-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phase Details Modal -->
+    <div id="phaseModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(10px);">
+        <div class="glass-card" style="width: 450px; max-width: 95vw; background: white; padding: 0; overflow: hidden; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);">
+            <div style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); padding: 1.5rem; color: white;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 id="pPhaseName" style="margin: 0; font-weight: 800;">Phase Details</h5>
+                    <button class="btn" onclick="document.getElementById('phaseModal').classList.add('hidden')" style="color: white; border: none; background: rgba(255,255,255,0.2); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">✕</button>
+                </div>
+            </div>
+            <div style="padding: 1.5rem;">
+                <div class="mb-4">
+                    <label class="small text-muted text-uppercase fw-bold" style="font-size: 10px; letter-spacing: 1px;">Description</label>
+                    <p id="pPhaseDesc" class="mt-1" style="color: #4b5563; font-size: 0.95rem; line-height: 1.6;"></p>
+                </div>
+                <div class="d-flex gap-3 mb-4">
+                    <div class="flex-grow-1 p-3 rounded-lg" style="background: #f9fafb; border: 1px solid #f3f4f6;">
+                        <label class="small text-muted d-block" style="font-size: 9px; font-weight: 700;">DEADLINE</label>
+                        <strong id="pPhaseDate" style="color: #111827;"></strong>
+                    </div>
+                    <div class="flex-grow-1 p-3 rounded-lg" style="background: #f9fafb; border: 1px solid #f3f4f6;">
+                        <label class="small text-muted d-block" style="font-size: 9px; font-weight: 700;">SUBMISSION</label>
+                        <strong id="pPhaseMode" style="color: #111827;"></strong>
+                    </div>
+                </div>
+                <div id="pPhaseStatus" class="p-3 rounded-lg text-center" style="font-weight: 700;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="detailsModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(10px);">
+        <div class="glass-card" style="width: 550px; max-width: 95vw; background: white; padding: 0; overflow: hidden; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);">
+            <!-- Modal Header with Gradient Banner -->
+            <div style="background: linear-gradient(135deg, #4f46e5 0%, #0D6EFC 100%); padding: 2.5rem 2rem; color: white; position: relative;">
+                <div style="position: absolute; top: -20px; right: -20px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                <div style="position: relative; z-index: 1;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                             <span class="badge" style="background: rgba(255,255,255,0.2); color: white; font-size: 10px; margin-bottom: 0.75rem; border: 1px solid rgba(255,255,255,0.3); display: inline-block;">TRAINING PROGRAM</span>
+                            <h2 id="modalName" style="margin: 0; font-size: 1.5rem; font-weight: 800; color: white;">Program Title</h2>
+                        </div>
+                        <button class="btn" onclick="closeDetailsModal()" style="background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer;">✕</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div style="padding: 2rem; max-height: 70vh; overflow-y: auto;">
+                <div class="mb-4">
+                    <h6 class="small text-muted mb-2 text-uppercase" style="letter-spacing: 1px; font-weight: 700; font-size: 10px;">Description</h6>
+                    <p id="modalDesc" style="color: #4b5563; line-height: 1.6; font-size: 0.95rem;"></p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                    <div style="background: #f9fafb; padding: 1rem; border-radius: 12px; border: 1px solid #f3f4f6;">
+                        <span style="display: block; font-size: 10px; color: #6b7280; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Venue</span>
+                        <strong id="modalVenue" style="color: #111827; font-size: 0.9rem;"></strong>
+                    </div>
+                    <div style="background: #f9fafb; padding: 1rem; border-radius: 12px; border: 1px solid #f3f4f6;">
+                        <span style="display: block; font-size: 10px; color: #6b7280; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Date</span>
+                        <strong id="modalDate" style="color: #111827; font-size: 0.9rem;"></strong>
+                    </div>
+                    <div style="background: #f9fafb; padding: 1rem; border-radius: 12px; border: 1px solid #f3f4f6;">
+                        <span style="display: block; font-size: 10px; color: #6b7280; font-weight: 700; text-transform: uppercase; margin-bottom: 4px;">Duration</span>
+                        <strong id="modalDays" style="color: #111827; font-size: 0.9rem;"></strong> <span style="font-size: 0.8rem; color: #6b7280;">Days</span>
+                    </div>
+                </div>
+
+                <div id="modalAttendanceSection" class="mb-4">
+                    <!-- Attendance records injected here -->
+                </div>
+
+                <div id="modalActionArea">
+                    <!-- Registration Button -->
+                </div>
+
+                <!-- Feedback Section -->
+                <div id="feedbackSection" class="hidden mt-4 border-top pt-4">
+                    <h5 class="mb-3" style="font-weight: 700; color: #111827;">Your Feedback</h5>
+                    <div class="form-group mb-3">
+                        <label class="form-label small text-muted">HOW WAS YOUR EXPERIENCE?</label>
+                        <div class="star-rating" id="starRating">
+                            <span class="star" data-value="5">★</span>
+                            <span class="star" data-value="4">★</span>
+                            <span class="star" data-value="3">★</span>
+                            <span class="star" data-value="2">★</span>
+                            <span class="star" data-value="1">★</span>
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label small text-muted">COMMENTS</label>
+                        <textarea id="fbComment" class="form-control" rows="3" placeholder="Tell us about your experience..." style="background: #f9fafb; border-radius: 10px; border-color: #e5e7eb;"></textarea>
+                    </div>
+                    <button class="btn btn-primary w-100" id="submitFeedbackBtn" style="padding: 0.75rem; border-radius: 10px; font-weight: 600; background: #4f46e5; border: none; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.4);">Submit Feedback</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Force Password Reset Modal -->
+    <div id="resetPassModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(8px);">
+        <div class="glass-card" style="width: 400px;">
+            <h3 class="gradient-text mb-2">Security Update</h3>
+            <p class="text-muted small mb-4">Your password was reset by the administrator. Please set a new password to continue.</p>
+            <div class="form-group">
+                <label class="form-label">New Password</label>
+                <input type="password" id="newPass" class="form-control" placeholder="Enter new password">
+            </div>
+            <div class="form-group mt-3">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" id="confirmPass" class="form-control" placeholder="Confirm new password">
+            </div>
+            <button class="btn btn-primary w-100 mt-4" id="saveNewPassBtn">Update Password</button>
+        </div>
+    </div>
+
+    <script src="js/db.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        checkAuth('student');
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            await db.ready;
+
+            const user = JSON.parse(sessionStorage.getItem('currentUser'));
+            if(user) {
+                // Check for forced password reset
+                const students = db.getStudents();
+                const currentStudent = students.find(s => s.registerNumber === user.registerNumber);
+                
+                if (currentStudent && currentStudent.forcePasswordReset) {
+                    document.getElementById('resetPassModal').classList.remove('hidden');
+                }
+
+                document.getElementById('saveNewPassBtn').onclick = () => {
+                    const newPass = document.getElementById('newPass').value;
+                    const confirmPass = document.getElementById('confirmPass').value;
+                    
+                    if (newPass.length < 6) {
+                        alert('Password must be at least 6 characters long.');
+                        return;
+                    }
+                    if (newPass !== confirmPass) {
+                        alert('Passwords do not match.');
+                        return;
+                    }
+                    
+                    const result = db.changePassword('student', user.registerNumber, newPass);
+                    if (result.success) {
+                        alert('Password updated successfully! Please login again.');
+                        logout();
+                    }
+                };
+
+                document.getElementById('studentName').textContent = `Welcome, ${user.name}`;
+                const avatar = user.name.charAt(0).toUpperCase();
+                const avatars = document.querySelectorAll('.user-avatar, #pModalAvatar');
+                avatars.forEach(el => el.textContent = avatar);
+
+                // Populate Profile Modal
+                document.getElementById('pModalStudentName').textContent = user.name;
+                document.getElementById('pModalRegNo').textContent = user.registerNumber;
+                document.getElementById('pModalDept').textContent = user.department;
+                document.getElementById('pModalPhone').textContent = user.phoneNumber;
+                document.getElementById('pModalEmail').textContent = user.mailId;
+                document.getElementById('pModalGender').textContent = user.gender;
+
+                window.openStudentProfile = () => {
+                    document.getElementById('studentProfileModal').classList.remove('hidden');
+                };
+                
+                renderTraining();
+            }
+
+            // Tab Navigation
+            const tabs = document.querySelectorAll('.sidebar-link.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.getElementById(`${tab.dataset.tab}Tab`).classList.add('active');
+                    if(tab.dataset.tab === 'training' || tab.dataset.tab === 'attendance') renderTraining();
+                    if(tab.dataset.tab === 'placement') renderPlacement();
+                    if(tab.dataset.tab === 'exams') renderExams();
+                });
+            });
+
+            // ---------- MCQ EXAMS (student) ----------
+            function studentExams() {
+                const programs = db.getTrainingPrograms();
+                const myProgIds = programs.filter(p => (p.registrations || []).includes(user.registerNumber)).map(p => p.id);
+                return db.getExams().filter(e => myProgIds.includes(e.programId)).map(e => {
+                    const prog = programs.find(p => p.id === e.programId);
+                    return { ...e, programName: prog ? prog.name : '' };
+                });
+            }
+
+            function examResult(programId) {
+                const s = db.getStudents().find(x => x.registerNumber === user.registerNumber);
+                let scores = {};
+                try { scores = (s && s.scores) ? (typeof s.scores === 'string' ? JSON.parse(s.scores) : s.scores) : {}; } catch (e) { scores = {}; }
+                return scores[programId];
+            }
+
+            window.renderExams = function () {
+                const list = document.getElementById('examsList');
+                const exams = studentExams();
+                if (exams.length === 0) {
+                    list.innerHTML = '<div class="glass-card text-center py-5"><p class="text-muted">No exams assigned to your registered programs yet.</p></div>';
+                    return;
+                }
+                list.innerHTML = exams.map(e => {
+                    const total = (e.questions || []).reduce((a, q) => a + (Number(q.marks) || 0), 0);
+                    const prev = examResult(e.programId);
+                    const done = prev != null;
+                    return `<div class="glass-card mb-3">
+                        <div class="d-flex justify-content-between align-items-center" style="flex-wrap:wrap;gap:0.5rem;">
+                            <div>
+                                <h5 style="margin:0;">${e.title}</h5>
+                                <small class="text-muted">${e.programName} · ${(e.questions || []).length} questions · ${total} marks · ${e.duration} min</small>
+                            </div>
+                            ${done
+                                ? `<span class="badge" style="background:${prev >= e.passMark ? '#ecfdf5' : '#fef2f2'};color:${prev >= e.passMark ? '#059669' : '#dc2626'};padding:6px 14px;border-radius:10px;">Score: ${prev} / ${total} · ${prev >= e.passMark ? 'Passed' : 'Failed'}</span>`
+                                : `<button class="btn btn-primary btn-sm" onclick="startExam('${e.id}')">Start Exam</button>`}
+                        </div>
+                    </div>`;
+                }).join('');
+            };
+
+            window.startExam = function (examId) {
+                const exam = db.getExams().find(e => e.id === examId);
+                if (!exam) return;
+                const qHtml = (exam.questions || []).map((q, i) => {
+                    let opts = '';
+                    if (q.type === 'truefalse') {
+                        opts = ['True', 'False'].map(o => `<label class="d-flex align-items-center gap-2 mb-1"><input type="radio" name="q${i}" value="${o}"> ${o}</label>`).join('');
+                    } else {
+                        const t = q.type === 'multiple' ? 'checkbox' : 'radio';
+                        opts = (q.options || []).map(o => `<label class="d-flex align-items-center gap-2 mb-1"><input type="${t}" name="q${i}" value="${o.replace(/"/g, '&quot;')}"> ${o}</label>`).join('');
+                    }
+                    return `<div class="glass-card mb-3"><strong>Q${i + 1}. ${q.text}</strong> <span class="text-muted small">(${q.marks} mark${q.marks > 1 ? 's' : ''})</span><div class="mt-2">${opts}</div></div>`;
+                }).join('');
+                const list = document.getElementById('examsList');
+                list.innerHTML = `
+                    <div class="glass-card mb-3 d-flex justify-content-between align-items-center">
+                        <h4 style="margin:0;">${exam.title}</h4>
+                        <span class="badge bg-primary" id="examTimer">${exam.duration}:00</span>
+                    </div>
+                    <form id="examForm">${qHtml}</form>
+                    <button class="btn btn-success" onclick="submitExam('${exam.id}')">Submit Exam</button>`;
+                startExamTimer(exam.duration, () => submitExam(exam.id));
+            };
+
+            let examTimerInt = null;
+            function startExamTimer(minutes, onEnd) {
+                let total = minutes * 60;
+                const el = document.getElementById('examTimer');
+                clearInterval(examTimerInt);
+                examTimerInt = setInterval(() => {
+                    total--;
+                    if (el) el.textContent = `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+                    if (total <= 0) { clearInterval(examTimerInt); onEnd(); }
+                }, 1000);
+            }
+
+            window.submitExam = function (examId) {
+                const exam = db.getExams().find(e => e.id === examId);
+                if (!exam) return;
+                clearInterval(examTimerInt);
+                let score = 0, totalMarks = 0;
+                (exam.questions || []).forEach((q, i) => {
+                    totalMarks += Number(q.marks) || 0;
+                    const picked = Array.from(document.querySelectorAll(`[name="q${i}"]:checked`)).map(x => x.value);
+                    const correct = q.correct || [];
+                    const isRight = picked.length === correct.length && picked.every(v => correct.includes(v));
+                    if (isRight) score += Number(q.marks) || 0;
+                    else if (picked.length && exam.negative) score -= Number(exam.negative) || 0;
+                });
+                if (score < 0) score = 0;
+                db.setStudentScore(user.registerNumber, exam.programId, score);
+                alert(`Exam submitted! Your score: ${score} / ${totalMarks} (${score >= exam.passMark ? 'Passed' : 'Failed'})`);
+                renderExams();
+            };
+
+
+            function renderPlacement() {
+                const activities = db.getPlacementActivities();
+                const container = document.getElementById('placementList');
+                container.innerHTML = '';
+
+                // Filter targeted activities
+                const targeted = activities.filter(a => {
+                    const t = a.target;
+                    if (!t || t.type === 'all') return true;
+                    
+                    const safeIncludes = (arr, val) => (arr || []).map(x => String(x).trim().toLowerCase()).includes(String(val).trim().toLowerCase());
+                    
+                    if(t.type === 'course' && safeIncludes(t.courses, user.course)) return true;
+                    if(t.type === 'dept' && safeIncludes(t.depts, user.department)) return true;
+                    if(t.type === 'student' && safeIncludes(t.students, user.registerNumber)) return true;
+                    return false;
+                });
+
+                if(targeted.length === 0) {
+                    container.innerHTML = '<div class="glass-card text-center p-5"><p class="text-muted">No placement activities currently targeted for you.</p></div>';
+                    return;
+                }
+
+                targeted.forEach(a => {
+                    const isRegistered = (a.registrations || []).includes(user.registerNumber);
+                    const card = document.createElement('div');
+                    card.className = 'glass-card w-100';
+                    card.style.padding = '1rem 1.5rem';
+                    card.style.cursor = 'pointer';
+                    card.style.transition = 'all 0.2s ease';
+                    card.onmouseover = () => card.style.transform = 'translateY(-2px)';
+                    card.onmouseout = () => card.style.transform = 'translateY(0)';
+                    card.onclick = () => openPlacementDetails(a.id);
+                    
+                    card.innerHTML = `
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div style="flex: 2; min-width: 0;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div style="width: 40px; height: 40px; border-radius: 10px; background: ${a.type === 'recruitment' ? '#ecfdf5' : '#eef2ff'}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="${a.type === 'recruitment' ? '#059669' : '#4f46e5'}"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
+                                    </div>
+                                    <div style="min-width: 0;">
+                                        <h5 class="mb-0" style="color: #111827; font-weight: 700; font-size: 1rem; letter-spacing: -0.01em;">${a.name}</h5>
+                                        <div class="d-flex align-items-center gap-2 mt-1">
+                                            <span class="badge" style="background: ${a.type === 'recruitment' ? '#059669' : '#4f46e5'}; font-size: 9px; text-transform: uppercase; color: white; padding: 2px 8px; border-radius: 4px; font-weight: 700;">${a.type || 'Placement'}</span>
+                                            ${isRegistered ? '<span class="badge" style="background: #ecfdf5; color: #059669; font-weight: 700; font-size: 9px; padding: 2px 8px; border-radius: 4px; border: 1px solid #bbf7d0;">Registered</span>' : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="flex: 1; text-align: center;">
+                                <div class="text-muted small fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">POSTED DATE</div>
+                                <div style="font-weight: 600; color: #374151;">${a.date}</div>
+                            </div>
+
+                            <div style="flex: 1; text-align: right;">
+                                <div class="d-flex align-items-center justify-content-end gap-2 text-primary" style="font-weight: 600; font-size: 0.9rem;">
+                                    View Details
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            window.openPlacementDetails = (id) => {
+                const a = db.getPlacementActivities().find(act => act.actId === id || act.id === id);
+                const isRegistered = (a.registrations || []).includes(user.registerNumber);
+
+                document.getElementById('pModalHeader').style.background = a.type === 'recruitment' ? 'linear-gradient(135deg, #059669 0%, #065f46 100%)' : 'linear-gradient(135deg, #4f46e5 0%, #0D6EFC 100%)';
+                document.getElementById('pModalType').textContent = a.type || 'Placement';
+                document.getElementById('pModalName').textContent = a.name;
+                document.getElementById('pModalDesc').textContent = a.description;
+                document.getElementById('pModalVenue').textContent = a.venue;
+                document.getElementById('pModalDate').textContent = a.date;
+
+                let progressHtml = '';
+                if (!isRegistered) {
+                    progressHtml = `
+                        <div style="text-align: center; padding: 2rem; background: #f9fafb; border-radius: 16px; border: 1px dashed #e5e7eb;">
+                            <p class="text-muted mb-3">You are not registered for this drive yet.</p>
+                            <button class="btn btn-primary px-5 py-2" style="font-weight: 700; border-radius: 25px;" onclick="applyForPlacement('${a.id}')">Apply Now</button>
+                        </div>
+                    `;
+                } else {
+                    let phasesHtml = '';
+                    (a.phases || []).forEach(p => {
+                        const isDone = (p.completions || []).includes(user.registerNumber);
+                        const canComplete = p.mode === 'self' && !isDone;
+                        phasesHtml += `
+                            <tr style="border-bottom: 1px solid #f3f4f6; cursor: pointer;" onclick="openPhaseModal('${a.id}', '${p.id}')">
+                                <td style="padding: 1rem 0.75rem;">
+                                    <div style="font-weight: 700; font-size: 0.85rem; color: #111827;">${p.name}</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">Click for details...</div>
+                                </td>
+                                <td style="padding: 1rem 0.75rem; text-align: center; vertical-align: middle;">
+                                    <div style="font-size: 0.75rem; color: #111827; font-weight: 700;">${p.lastDate}</div>
+                                </td>
+                                <td style="padding: 1rem 0.75rem; text-align: right; vertical-align: middle;">
+                                    ${isDone ? '<span class="badge" style="background: #ecfdf5; color: #059669; font-weight: 700; font-size: 10px; padding: 4px 12px; border-radius: 6px;">✓ Cleared</span>' : 
+                                     (canComplete ? `<button class="btn btn-primary btn-sm" style="font-size: 10px;" onclick="event.stopPropagation(); declarePhase('${a.id}', '${p.id}')">Complete</button>` : 
+                                     '<span class="badge" style="background: #fffbeb; color: #d97706; font-weight: 700; font-size: 10px; padding: 4px 12px; border-radius: 6px;">Pending</span>')}
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    progressHtml = `
+                        <h6 class="small text-muted mb-3 text-uppercase" style="letter-spacing: 1.5px; font-size: 11px; font-weight: 800;">STAGE PROGRESS</h6>
+                        <table class="table table-sm table-borderless">
+                            <tbody>${phasesHtml || '<tr><td class="text-center text-muted py-4">No phases defined.</td></tr>'}</tbody>
+                        </table>
+                    `;
+                }
+                document.getElementById('pModalProgress').innerHTML = progressHtml;
+                document.getElementById('placementDetailsModal').classList.remove('hidden');
+            };
+
+            window.openPhaseModal = (activityId, phaseId) => {
+                const activity = db.getPlacementActivities().find(a => a.id === activityId);
+                const phase = activity.phases.find(p => p.id === phaseId);
+                const isDone = (phase.completions || []).includes(user.registerNumber);
+
+                document.getElementById('pPhaseName').textContent = phase.name;
+                document.getElementById('pPhaseDesc').textContent = phase.description;
+                document.getElementById('pPhaseDate').textContent = phase.lastDate;
+                document.getElementById('pPhaseMode').textContent = phase.mode === 'self' ? 'Student Declaration' : 'Admin Selection';
+                
+                const statusEl = document.getElementById('pPhaseStatus');
+                if (isDone) {
+                    statusEl.textContent = 'STAGE COMPLETED';
+                    statusEl.style.background = '#ecfdf5';
+                    statusEl.style.color = '#059669';
+                    statusEl.style.border = '1px solid #bbf7d0';
+                } else {
+                    statusEl.textContent = 'STAGE PENDING';
+                    statusEl.style.background = '#fffbeb';
+                    statusEl.style.color = '#d97706';
+                    statusEl.style.border = '1px solid #fef3c7';
+                }
+
+                document.getElementById('phaseModal').classList.remove('hidden');
+            };
+
+            window.applyForPlacement = (id) => {
+                if(confirm('Are you sure you want to apply for this recruitment drive?')) {
+                    const result = db.registerForPlacement(id, user.registerNumber);
+                    alert(result.message);
+                    renderPlacement();
+                }
+            };
+
+            window.declarePhase = (activityId, phaseId) => {
+                if(confirm('Confirm phase completion?')) {
+                    db.togglePhaseCompletion(activityId, phaseId, user.registerNumber, true);
+                    renderPlacement();
+                }
+            };
+            function renderTraining() {
+                const programs = db.getTrainingPrograms();
+                const container = document.getElementById('trainingList');
+                container.innerHTML = '';
+
+                // Filter programs matching student or targeted at 'all'
+                const targetedPrograms = programs.filter(p => {
+                    if (!p.target || p.target.type === 'all') return true;
+                    
+                    const studentCourse = (user.course || '').trim();
+                    const studentDept = (user.department || '').trim();
+
+                    if (p.target.type === 'course') {
+                        return (p.target.courses || []).includes(studentCourse);
+                    }
+                    if (p.target.type === 'dept') {
+                        return (p.target.depts || []).includes(studentDept);
+                    }
+                    return false;
+                });
+
+                if (targetedPrograms.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No training programs available for you at the moment.</p>';
+                } else {
+                    targetedPrograms.forEach(p => {
+                        const isRegistered = p.registrations.includes(user.registerNumber);
+                        const card = document.createElement('div');
+                        card.className = `glass-card w-100 ${isRegistered ? 'registered-card' : ''}`;
+                        card.style.padding = '1rem 1.5rem';
+                        card.style.cursor = 'pointer';
+                        card.onclick = () => openDetailsModal(p.id);
+                        card.innerHTML = `
+                            <div class="d-flex align-items-center w-100" style="padding: 0.5rem 0;">
+                                <div style="flex: 2; min-width: 200px;">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <h5 class="mb-0" style="color: #111827; font-weight: 700; font-size: 1rem;">${p.name}</h5>
+                                        <span class="badge bg-info" style="font-size: 9px; color: white; padding: 2px 6px; border-radius: 4px;">Training</span>
+                                    </div>
+                                    <p class="text-muted small mb-0 text-truncate" style="max-width: 350px;">${p.description}</p>
+                                </div>
+                                
+                                <div style="flex: 1.5; text-align: center;">
+                                    <div class="d-flex align-items-center justify-content-center gap-1 text-muted small mb-1">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/></svg>
+                                        <span style="font-weight: 600;">${p.date}</span>
+                                    </div>
+                                    <div class="text-muted" style="font-size: 11px; opacity: 0.8;">${p.days} Days Duration</div>
+                                </div>
+
+                                <div style="flex: 1.5; text-align: center;">
+                                    <div class="d-flex align-items-center justify-content-center gap-1 text-muted small">
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                        <span class="text-truncate" style="max-width: 150px; font-weight: 500;">${p.venue}</span>
+                                    </div>
+                                </div>
+
+                                <div style="flex: 1; text-align: right;">
+                                    ${isRegistered 
+                                        ? '<span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-weight: 700; font-size: 11px; padding: 6px 12px; border-radius: 6px;">Registered</span>' 
+                                        : '<span class="badge" style="background: rgba(79, 70, 229, 0.1); color: #4f46e5; font-weight: 700; font-size: 11px; padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(79, 70, 229, 0.2);">Available</span>'}
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                }
+
+                // Render Program Details (per-program summary)
+                try {
+                    const attendance = db.getStudentAttendance(user.registerNumber);
+                    const attnContainer = document.getElementById('attendanceRecord');
+                    attnContainer.innerHTML = '';
+
+                    const myPrograms = (attendance || []).filter(a => a.isRegistered);
+                    if (myPrograms.length === 0) {
+                        attnContainer.innerHTML = '<div class="glass-card text-center py-5"><p class="text-muted">You are not registered for any training programs yet.</p></div>';
+                    } else {
+                        const cards = myPrograms.map(a => {
+                            const sessions = a.sessions || [];
+                            const total = sessions.length;
+                            const attended = sessions.filter(s => s.present).length;
+                            const pct = total ? Math.round(attended / total * 100) : 0;
+                            let status, color, bg;
+                            if (total === 0) { status = 'No sessions yet'; color = '#6b7280'; bg = '#f3f4f6'; }
+                            else if (attended === 0) { status = 'Not Attended'; color = '#dc2626'; bg = '#fef2f2'; }
+                            else if (pct >= 75) { status = 'Completed'; color = '#059669'; bg = '#ecfdf5'; }
+                            else { status = 'In Progress'; color = '#d97706'; bg = '#fffbeb'; }
+                            const score = (a.score != null && a.score !== '') ? a.score : '—';
+                            const sessionList = total ? sessions.map((s, i) =>
+                                `<div class="d-flex justify-content-between" style="padding:0.4rem 0;border-bottom:1px solid #f3f4f6;font-size:0.85rem;">
+                                    <span>Session ${i + 1} <span class="text-muted">· ${s.date} ${s.time || ''}</span>${s.venue ? ` <span class="text-muted">· 📍 ${s.venue}</span>` : ''}</span>
+                                    <span style="font-weight:700;color:${s.present ? '#059669' : '#dc2626'};">${s.present ? 'Present' : 'Absent'}</span>
+                                </div>`).join('') : '<p class="text-muted small mb-0">No sessions scheduled yet.</p>';
+                            return `
+                                <div class="glass-card mb-3">
+                                    <div class="d-flex justify-content-between align-items-center" style="flex-wrap:wrap;gap:0.5rem;">
+                                        <div>
+                                            <h5 style="margin:0;color:#111827;">${a.name}</h5>
+                                            <small class="text-muted">Attendance: ${attended}/${total} sessions · Score: ${score}</small>
+                                        </div>
+                                        <span class="badge" style="background:${bg};color:${color};border:1px solid ${color}33;font-size:12px;padding:6px 14px;border-radius:10px;">${status} · ${pct}%</span>
+                                    </div>
+                                    <div style="background:#eef2f7;border-radius:999px;height:8px;margin:0.85rem 0;overflow:hidden;">
+                                        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2563eb,#1d4ed8);"></div>
+                                    </div>
+                                    <details>
+                                        <summary style="cursor:pointer;color:#1d4ed8;font-size:0.85rem;font-weight:600;">View sessions</summary>
+                                        <div style="margin-top:0.5rem;">${sessionList}</div>
+                                    </details>
+                                </div>`;
+                        }).join('');
+                        attnContainer.innerHTML = cards;
+                    }
+                } catch (err) {
+                    console.error('Error rendering program details:', err);
+                }
+            }
+
+            window.openDetailsModal = (id) => {
+                const programs = db.getTrainingPrograms();
+                const p = programs.find(program => program.id === id);
+                if(!p) return;
+
+                document.getElementById('modalName').textContent = p.name;
+                document.getElementById('modalDesc').textContent = p.description;
+                document.getElementById('modalVenue').textContent = p.venue;
+                document.getElementById('modalDate').textContent = p.date;
+                document.getElementById('modalDays').textContent = p.days;
+
+                const actionArea = document.getElementById('modalActionArea');
+                const feedbackSection = document.getElementById('feedbackSection');
+                const attnSection = document.getElementById('modalAttendanceSection');
+                const isRegistered = p.registrations.includes(user.registerNumber);
+
+                attnSection.innerHTML = ''; // clear previous
+
+                if(isRegistered) {
+                    actionArea.innerHTML = '<div class="alert alert-success text-center py-3 mb-0" style="background: rgba(16, 185, 129, 0.1); color: #065f46; border: 1px dashed #10b981; border-radius: 12px; font-weight: 600;">✓ You are already registered for this program.</div>';
+                    
+                    // Fetch and display attendance
+                    try {
+                        const allAttendance = db.getStudentAttendance(user.registerNumber) || [];
+                        const programAttn = allAttendance.find(a => a.id === p.id);
+                        if (programAttn && programAttn.sessions && programAttn.sessions.length > 0) {
+                            let attnHtml = '<h6 class="small text-muted mb-2 text-uppercase" style="letter-spacing: 1px; font-size: 10px; font-weight: 700; margin-top: 1rem;">YOUR ATTENDANCE RECORD</h6>';
+                            programAttn.sessions.forEach((s, idx) => {
+                                attnHtml += `
+                                    <div class="d-flex justify-content-between align-items-center p-3 rounded-lg mb-2" style="background-color: ${s.present ? '#f0fdf4' : '#fef2f2'}; border: 1px solid ${s.present ? '#bbf7d0' : '#fecaca'}; border-radius: 10px;">
+                                        <div>
+                                            <div style="font-weight: 700; color: #111827; font-size: 0.9rem;">Session ${idx+1}</div>
+                                            <div class="text-muted" style="font-size: 0.75rem;">${s.date} • ${s.time || 'N/A'}</div>
+                                        </div>
+                                        <div style="font-weight: 700; color: ${s.present ? '#16a34a' : '#dc2626'}; font-size: 0.85rem; padding: 4px 12px; background: white; border-radius: 20px; border: 1px solid ${s.present ? '#bbf7d0' : '#fecaca'};">
+                                            ${s.present ? 'Present' : 'Absent'}
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            attnSection.innerHTML = attnHtml;
+                        } else {
+                            attnSection.innerHTML = '<div class="text-muted small py-3 px-3 bg-light rounded text-center border" style="border-color: #e5e7eb !important; border-radius: 12px; border-style: dashed !important;">No attendance records published yet for this program.</div>';
+                        }
+                    } catch (err) {
+                        console.error('Error fetching modal attendance:', err);
+                    }
+
+                    const hasSubmitted = (p.feedbacks || []).some(f => f.regNo === user.registerNumber);
+
+                    if (p.isFeedbackOpen && !hasSubmitted) {
+                        feedbackSection.classList.remove('hidden');
+                        
+                        // Initialize Stars
+                        let selectedRating = 5;
+                        const stars = document.querySelectorAll('.star');
+                        stars.forEach(s => {
+                            s.onclick = () => {
+                                selectedRating = s.dataset.value;
+                                stars.forEach(st => {
+                                    st.classList.toggle('active', st.dataset.value <= selectedRating);
+                                });
+                            };
+                        });
+
+                        document.getElementById('submitFeedbackBtn').onclick = () => submitFeedback(p.id, selectedRating);
+                    } else if (hasSubmitted) {
+                        feedbackSection.innerHTML = '<div class="alert alert-info text-center py-3 mb-0" style="border-radius: 12px; border: 1px dashed #3b82f6; background: #eff6ff; color: #1e40af; font-weight: 600;">Thank you for your feedback!</div>';
+                        feedbackSection.classList.remove('hidden');
+                    } else {
+                        feedbackSection.classList.add('hidden');
+                    }
+                } else if(!p.isRegistrationOpen) {
+                    actionArea.innerHTML = '<div class="alert alert-danger text-center py-3 mb-0" style="border-radius: 12px; background: #fff1f2; color: #9f1239; border: 1px dashed #fb7185; font-weight: 600;">Registration is currently closed for this program.</div>';
+                    feedbackSection.classList.add('hidden');
+                } else {
+                    actionArea.innerHTML = `<button class="btn btn-primary w-100" onclick="registerForTraining('${p.id}')" style="padding: 1rem; border-radius: 12px; font-weight: 700; font-size: 1rem; background: #4f46e5; border: none; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);">Register for Program</button>`;
+                    feedbackSection.classList.add('hidden');
+                }
+
+                document.getElementById('detailsModal').classList.remove('hidden');
+            };
+
+            window.submitFeedback = (pid, rating) => {
+                const comment = document.getElementById('fbComment').value.trim();
+                
+                if(!comment) {
+                    alert('Please provide some comments.');
+                    return;
+                }
+
+                const result = db.submitTrainingFeedback(pid, user.registerNumber, { rating, comment });
+                alert(result.message);
+                if(result.success) {
+                    closeDetailsModal();
+                    renderTraining();
+                }
+            };
+
+            window.closeDetailsModal = () => {
+                document.getElementById('detailsModal').classList.add('hidden');
+            };
+
+            window.registerForTraining = (id) => {
+                const result = db.registerForProgram(id, user.registerNumber);
+                alert(result.message);
+                if(result.success) {
+                    closeDetailsModal();
+                    renderTraining();
+                }
+            };
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - Placement Cell</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+</head>
+
+<body class="premium-ui">
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="college-logo-placeholder" style="margin-bottom: 1rem;">CC</div>
+            <a href="#" class="sidebar-brand">Teacher Portal</a>
+            <ul class="sidebar-nav">
+                <li>
+                    <a class="sidebar-link tab active" data-tab="dashboard">
+                        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a class="sidebar-link tab" data-tab="calendar">
+                        <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+                        Program Calendar
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="#" onclick="logout()" class="btn btn-danger w-100"
+                    style="padding: 0.5rem 1rem; font-size: 13px; border: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="white">
+                        <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+                    </svg>
+                    Logout
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content" style="padding: 0;">
+            <div class="top-header">
+                <div>
+                    <div class="breadcrumb">Portal / Dashboard</div>
+                    <h1 class="page-title" id="teacherName">Welcome, Teacher</h1>
+                </div>
+                <div class="user-profile">
+                    <button class="btn btn-sm" onclick="openProfile()" style="background: #eef2ff; color: #4f46e5; border: 1px solid #c7d2fe; font-weight: 600;">
+                        My Profile
+                    </button>
+                    <div class="user-info" style="text-align: right; margin-left: 1rem;">
+                        <span class="user-role">Teacher Portal</span>
+                    </div>
+                    <div class="user-avatar">T</div>
+                </div>
+            </div>
+
+            <div class="content-body">
+                
+                <!-- Dashboard Tab -->
+                <div id="dashboardTab" class="tab-content active" style="background: #f3f4f6; padding: 1.5rem; margin: -1.5rem; min-height: 100vh;">
+                    
+                    <div class="alert alert-info mb-4" style="border-radius: 8px;">
+                        <strong>Department View:</strong> Showing statistics exclusively for your assigned department.
+                    </div>
+
+                    <!-- Top Metrics (4 Cards) -->
+                    <div class="stat-grid-4 mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #eef2ff; color: #6366f1;">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-title">Total Students</span>
+                                <span class="stat-value" id="dashTotalStudents">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #f3e8ff; color: #a855f7;">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2.12-1.15V17h2V9L12 3z"/></svg>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-title">Total Trainings</span>
+                                <span class="stat-value" id="dashTotalTrainings">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #e0f2fe; color: #0ea5e9;">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/></svg>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-title">Placement Activities</span>
+                                <span class="stat-value" id="dashTotalActivities">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #ecfdf5; color: #10b981;">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2z"/></svg>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-title">Total Recruitments</span>
+                                <span class="stat-value" id="dashTotalRecruitments">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Overview Container -->
+                    <div class="overview-grid-2">
+                        <!-- Section 1: Placement Status -->
+                        <div class="overview-card">
+                            <div class="overview-header">
+                                <div class="d-flex align-items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="#4b5563"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                                    <h4 class="m-0" style="color: #374151; font-size: 1.1rem; font-weight: 600;">Placement Status Overview</h4>
+                                </div>
+                                <span style="color: #6b7280; font-size: 0.9rem;" id="dashPlacementTotalText">Total: 0</span>
+                            </div>
+                            
+                            <div class="overview-chart-wrapper">
+                                <canvas id="placementStatusChart"></canvas>
+                                <div class="chart-center-text" id="placementChartCenter">
+                                    <h2 style="margin: 0; font-size: 2rem; font-weight: 800; color: #111827;" id="placementPercentText">0%</h2>
+                                    <span style="font-size: 0.75rem; font-weight: 600; color: #6b7280; letter-spacing: 1px;">PLACED</span>
+                                </div>
+                            </div>
+
+                            <div class="overview-legend">
+                                <div class="legend-item"><span class="dot" style="background: #3b82f6;"></span><span style="color: #3b82f6;">Placed Students</span></div>
+                                <div class="legend-item"><span class="dot" style="background: #10b981;"></span><span style="color: #10b981;">In Process</span></div>
+                                <div class="legend-item"><span class="dot" style="background: #f59e0b;"></span><span style="color: #f59e0b;">Unplaced</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Training Status -->
+                        <div class="overview-card">
+                            <div class="overview-header">
+                                <div class="d-flex align-items-center gap-2">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="#4b5563"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                                    <h4 class="m-0" style="color: #374151; font-size: 1.1rem; font-weight: 600;">Training Status Overview</h4>
+                                </div>
+                                <span style="color: #6b7280; font-size: 0.9rem;" id="dashTrainingTotalText">Total: 0</span>
+                            </div>
+                            
+                            <div class="overview-chart-wrapper">
+                                <canvas id="trainingStatusChart"></canvas>
+                                <div class="chart-center-text" id="trainingChartCenter">
+                                    <h2 style="margin: 0; font-size: 2rem; font-weight: 800; color: #111827;" id="trainingPercentText">0%</h2>
+                                    <span style="font-size: 0.75rem; font-weight: 600; color: #6b7280; letter-spacing: 1px;">COMPLETED</span>
+                                </div>
+                            </div>
+
+                            <div class="overview-legend">
+                                <div class="legend-item"><span class="dot" style="background: #3b82f6;"></span><span style="color: #3b82f6;">Attending Trainings</span></div>
+                                <div class="legend-item"><span class="dot" style="background: #10b981;"></span><span style="color: #10b981;">Completed Trainings</span></div>
+                                <div class="legend-item"><span class="dot" style="background: #f59e0b;"></span><span style="color: #f59e0b;">Not Attending</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Activity Course-wise Attendance Chart -->
+                    <div class="overview-card mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="m-0" style="color: #374151; font-size: 1.1rem; font-weight: 600;">Activity Course-wise Attendance</h4>
+                            <select id="dashFilterActivity" class="form-control form-control-sm" style="width: 250px; font-size: 0.85rem; padding: 0.25rem 2rem 0.25rem 0.5rem;">
+                                <option value="">Select Activity...</option>
+                            </select>
+                        </div>
+                        <div style="position: relative; height: 300px; width: 100%;">
+                            <canvas id="activityAttendanceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Placed Students Table -->
+                    <div class="overview-card mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="m-0" style="color: #374151; font-size: 1.1rem; font-weight: 600;">Placed Students Overview</h4>
+                            <div class="d-flex gap-2">
+                                <select id="dashFilterCourse" class="form-control form-control-sm" style="width: auto; font-size: 0.85rem; padding: 0.25rem 2rem 0.25rem 0.5rem;">
+                                    <option value="">All Courses</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table" id="dashboardPlacedTable">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Course</th>
+                                        <th>Number of Placement Activities</th>
+                                        <th>Number of Recruitments</th>
+                                        <th>Placed Recruitment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dashboard Placed Table Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Calendar Tab -->
+                <div id="calendarTab" class="tab-content glass-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                        <div>
+                            <h3 style="margin-bottom: 0.25rem; color: #111827; font-size: 1.25rem;">Program Calendar</h3>
+                            <p style="color: #6b7280; font-size: 0.875rem; margin: 0;">Visual schedule of activities relevant to your department.</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <select id="calMonth" class="form-control" style="width: 140px;"></select>
+                            <select id="calYear" class="form-control" style="width: 100px;"></select>
+                        </div>
+                    </div>
+                    <div id="calendarContainer" style="padding: 1rem; background: #fff; border-radius: 12px;">
+                        <!-- Calendar will be rendered here -->
+                    </div>
+                </div>
+
+            </div> <!-- content-body -->
+        </main>
+    </div>
+
+    <!-- Teacher Profile Modal -->
+    <div id="teacherProfileModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(8px);">
+        <div class="glass-card" style="width: 400px; max-width: 95vw; background: white; overflow: hidden; padding: 0; border: none; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border-radius: 16px;">
+            <!-- Profile Banner -->
+            <div style="background: linear-gradient(135deg, #0D6EFC 0%, #3b82f6 100%); padding: 2.5rem 2rem; color: white; position: relative; text-align: center;">
+                <div style="position: absolute; top: -20px; right: -20px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                <div style="position: absolute; bottom: -20px; left: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
+                
+                <div style="width: 80px; height: 80px; background: white; color: #0D6EFC; border-radius: 50%; font-size: 2rem; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto; position: relative; z-index: 1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                    T
+                </div>
+                <h2 id="pName" style="margin: 0; font-size: 1.5rem; font-weight: 700; color: white; position: relative; z-index: 1;">Teacher Name</h2>
+                <p id="pDept" style="margin: 0.25rem 0 0; opacity: 0.9; font-size: 0.95rem; font-weight: 500; position: relative; z-index: 1;">Department</p>
+                
+                <button class="btn" onclick="closeProfile()" style="position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.3s; padding: 0; z-index: 2;">✕</button>
+            </div>
+            
+            <!-- Profile Details -->
+            <div style="padding: 2rem;">
+                <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                    <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                        <div style="background: #eef2ff; padding: 8px; border-radius: 8px; color: #4f46e5;">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                        </div>
+                        <div>
+                            <span style="display: block; font-size: 0.75rem; color: #6b7280; font-weight: 600; text-transform: uppercase;">Email Address</span>
+                            <strong id="pEmail" style="color: #111827; font-size: 0.95rem;">email@example.com</strong>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                        <div style="background: #ecfdf5; padding: 8px; border-radius: 8px; color: #059669;">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                        </div>
+                        <div>
+                            <span style="display: block; font-size: 0.75rem; color: #6b7280; font-weight: 600; text-transform: uppercase;">Phone (Username)</span>
+                            <strong id="pPhone" style="color: #111827; font-size: 0.95rem;">+1234567890</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/db.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/teacher.js"></script>
+</body>
+</html>
