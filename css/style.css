@@ -1503,13 +1503,14 @@ select.form-control { cursor: pointer; }
 }
 
 /* ---------- Tables ---------- */
-.premium-ui .table { border-collapse: separate; border-spacing: 0; }
+.premium-ui .table { border-collapse: separate; border-spacing: 0; width: 100%; }
 .premium-ui .table thead th {
     background: #f8fafc; color: #64748b;
     font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 700;
     padding: .85rem 1rem; border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
 }
-.premium-ui .table tbody td { padding: .9rem 1rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+.premium-ui .table tbody td { padding: .9rem 1rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; white-space: nowrap; }
 .premium-ui .table tbody tr { transition: background .12s ease; }
 .premium-ui .table tbody tr:hover { background: #f5f8ff; }
 .premium-ui .table tbody tr:last-child td { border-bottom: none; }
@@ -1540,7 +1541,7 @@ select.form-control { cursor: pointer; }
 @keyframes premPop { from { opacity:0; transform: translateY(14px) scale(.98); } to { opacity:1; transform:none; } }
 
 /* ---------- Login page ---------- */
-.premium-ui .login-wrapper { background: radial-gradient(1200px 500px at 50% -10%, #16233f 0%, #0b1220 55%, #070b14 100%); }
+.premium-ui .login-wrapper { background: url('../Background.jpg') no-repeat center center; background-size: cover; }
 .premium-ui .login-card {
     border-radius: 22px; padding: 2.5rem 2.25rem; border: 1px solid rgba(255,255,255,.06);
     box-shadow: 0 40px 90px -30px rgba(0,0,0,.6);
@@ -1565,3 +1566,166 @@ select.form-control { cursor: pointer; }
 /* Missing flex utility — used by phase list, etc. (fixes cramped horizontal cards) */
 .flex-column { flex-direction: column; }
 .flex-wrap { flex-wrap: wrap; }
+
+/* ---------- Premium Alignments & Redesigns ---------- */
+
+/* Prevent student table from wrapping and ensure consistent height & alignment */
+#studentsTable th,
+#studentsTable td {
+    white-space: nowrap !important;
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#studentsTable tbody tr {
+    height: 52px;
+}
+#studentsTable th {
+    font-weight: 700 !important;
+    letter-spacing: 0.05em;
+}
+#studentsTable th:nth-child(1) { width: 120px; } /* Reg No */
+#studentsTable th:nth-child(2) { width: 180px; } /* Name */
+#studentsTable th:nth-child(3) { width: 130px; } /* Phone */
+#studentsTable th:nth-child(4) { width: 200px; } /* Email */
+#studentsTable th:nth-child(5) { width: 110px; } /* Course */
+#studentsTable th:nth-child(6) { width: 160px; } /* Dept */
+#studentsTable th:nth-child(7) { width: 100px; } /* Class */
+#studentsTable th:nth-child(8) { width: 90px; }  /* Gender */
+#studentsTable th:nth-child(9) { width: 180px; } /* Actions */
+
+/* Numeric & Center Column Alignments */
+.text-center {
+    text-align: center !important;
+}
+
+/* Reports Tab Summary Cards Layout (Desktop: 5 cards inline) */
+.stat-grid-5 {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1.25rem;
+}
+@media (max-width: 1200px) {
+    .stat-grid-5 {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+}
+
+/* Premium Class Cards */
+.class-card-premium {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.025);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.class-card-premium:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.1), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Premium Responsive Modals Architecture */
+.premium-modal-wrapper {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+}
+.premium-modal-wrapper:not(.hidden) {
+    opacity: 1;
+    pointer-events: auto;
+}
+.premium-modal-card {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    width: 700px;
+    max-width: 95vw;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(24px);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.premium-modal-wrapper:not(.hidden) .premium-modal-card {
+    transform: translateY(0);
+}
+.premium-modal-header {
+    background: linear-gradient(135deg, #0a0f1c 0%, #2563eb 100%);
+    padding: 1.75rem 2rem;
+    color: #ffffff;
+    position: relative;
+    flex-shrink: 0;
+}
+.premium-modal-header h2,
+.premium-modal-header h3,
+.premium-modal-header h4 {
+    margin: 0;
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: -0.025em;
+}
+.premium-modal-header p {
+    margin: 0.35rem 0 0 0;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.88rem;
+    font-weight: 400;
+}
+.premium-modal-close-btn {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #ffffff;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+    padding: 0;
+    font-size: 0.85rem;
+    line-height: 1;
+}
+.premium-modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+.premium-modal-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    margin: 0;
+}
+.premium-modal-body {
+    padding: 2rem;
+    overflow-y: auto;
+    flex: 1;
+}
+.premium-modal-footer {
+    padding: 1.25rem 2rem;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}

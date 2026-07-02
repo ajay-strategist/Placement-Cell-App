@@ -10,6 +10,7 @@ class Database {
             trainingPrograms: [],
             placementActivities: [],
             exams: [],
+            classIncharges: [],
             admin: { username: 'admin', password: 'Admin@1234' }
         };
         this.ready = this.init();
@@ -28,6 +29,7 @@ class Database {
                 if (data["Training Program"] && data["Training Program"].length > 0) this.cache.trainingPrograms = data["Training Program"];
                 if (data["Activity"] && data["Activity"].length > 0) this.cache.placementActivities = data["Activity"];
                 if (data["Exams"] && data["Exams"].length > 0) this.cache.exams = data["Exams"];
+                if (data["ClassIncharge"] && data["ClassIncharge"].length > 0) this.cache.classIncharges = data["ClassIncharge"];
                 
                 this.parseCache();
 
@@ -169,36 +171,50 @@ class Database {
                 serializedData = this.serializeFields(sheetName, data);
             }
 
-            await fetch(this.apiUrl, {
+            const response = await fetch(this.apiUrl, {
                 method: 'POST',
-                mode: 'no-cors', // Google Apps Script requires no-cors for simple POST
                 body: JSON.stringify({
                     action: 'save',
                     sheet: sheetName,
                     data: serializedData
                 })
             });
+            const result = await response.json();
+            if (result && !result.success) {
+                console.error(`Sync failed for ${sheetName}:`, result.error || result.message);
+                return { success: false, message: result.message || 'Sync failed.' };
+            }
             // Update local backup
             localStorage.setItem('db_cache', JSON.stringify(this.cache));
+            return { success: true, message: 'Synced successfully.' };
         } catch (error) {
             console.error(`Sync failed for ${sheetName}:`, error);
+            localStorage.setItem('db_cache', JSON.stringify(this.cache));
+            return { success: false, message: 'Sync failed: saved locally.' };
         }
     }
 
     async deleteRecord(sheetName, id) {
         try {
-            await fetch(this.apiUrl, {
+            const response = await fetch(this.apiUrl, {
                 method: 'POST',
-                mode: 'no-cors',
                 body: JSON.stringify({
                     action: 'delete',
                     sheet: sheetName,
                     id: id
                 })
             });
+            const result = await response.json();
+            if (result && !result.success) {
+                console.error(`Delete failed for ${sheetName}:`, result.error || result.message);
+                return { success: false, message: result.message || 'Delete failed.' };
+            }
             localStorage.setItem('db_cache', JSON.stringify(this.cache));
+            return { success: true };
         } catch (error) {
             console.error(`Delete failed for ${sheetName}:`, error);
+            localStorage.setItem('db_cache', JSON.stringify(this.cache));
+            return { success: false, message: 'Delete failed: removed locally.' };
         }
     }
 
@@ -652,22 +668,156 @@ class Database {
         return { success: true };
     }
 
-    // --- Class Incharge (manual mapping, persisted locally + best-effort cloud) ---
+    getClassIncharges() {
+        return this.cache.classIncharges || [];
+    }
+
     getClassIncharge(className) {
-        try {
-            const m = JSON.parse(localStorage.getItem('classIncharges') || '{}');
-            return m[className] || '';
-        } catch (e) { return ''; }
+        const row = (this.cache.classIncharges || []).find(c => c.className === className);
+        return row ? row.incharge : '';
     }
 
     setClassIncharge(className, incharge) {
-        let m = {};
-        try { m = JSON.parse(localStorage.getItem('classIncharges') || '{}'); } catch (e) { m = {}; }
-        m[className] = incharge;
-        localStorage.setItem('classIncharges', JSON.stringify(m));
-        // Best-effort cloud sync (requires a "ClassIncharge" sheet in Apps Script)
-        try { this.sync('ClassIncharge', { className, incharge }); } catch (e) {}
+        this.cache.classIncharges = this.cache.classIncharges || [];
+        const index = this.cache.classIncharges.findIndex(c => c.className === className);
+        const row = { className, incharge };
+        if (index !== -1) {
+            this.cache.classIncharges[index] = row;
+        } else {
+            this.cache.classIncharges.push(row);
+        }
+        this.sync('ClassIncharge', row);
         return { success: true };
+    }
+
+    changePassword(role, id, newPassword) {
+        if (role === 'student') {
+            const index = this.cache.students.findIndex(s => s.registerNumber === id);
+            if (index !== -1) {
+                this.cache.students[index].password = newPassword;
+                delete this.cache.students[index].forcePasswordReset;
+                this.sync("Students", this.cache.students[index]);
+                return { success: true, message: 'Password updated successfully.' };
+            }
+        } else if (role === 'teacher') {
+            const index = this.cache.teachers.findIndex(t => t.phoneNumber === id);
+            if (index !== -1) {
+                this.cache.teachers[index].password = newPassword;
+                this.sync("Teacher", this.cache.teachers[index]);
+                return { success: true, message: 'Password updated successfully.' };
+            }
+        }
+        return { success: false, message: 'User not found.' };
+    }
+
+    registerForPlacement(activityId, regNo) {
+        const index = this.cache.placementActivities.findIndex(a => a.id === activityId);
+        if (index === -1) return { success: false, message: 'Placement activity not found.' };
+        const activity = this.cache.placementActivities[index];
+        activity.registrations = activity.registrations || [];
+        if (activity.registrations.includes(regNo)) {
+            return { success: false, message: 'You are already registered.' };
+        }
+        activity.registrations.push(regNo);
+        this.sync("Activity", activity);
+        return { success: true, message: 'Successfully registered for recruitment drive.' };
+    }
+
+    togglePhaseCompletion(activityId, phaseId, regNo, isNowComplete) {
+        const index = this.cache.placementActivities.findIndex(a => a.id === activityId);
+        if (index === -1) return { success: false, message: 'Activity not found.' };
+        const activity = this.cache.placementActivities[index];
+        activity.phases = activity.phases || [];
+        const phaseIndex = activity.phases.findIndex(p => p.id === phaseId);
+        if (phaseIndex === -1) return { success: false, message: 'Phase not found.' };
+        const phase = activity.phases[phaseIndex];
+        phase.completions = phase.completions || [];
+        
+        if (isNowComplete) {
+            // Enforce phase-by-phase qualification
+            if (phaseIndex > 0) {
+                const prevPhase = activity.phases[phaseIndex - 1];
+                const prevCompletions = prevPhase.completions || [];
+                if (!prevCompletions.includes(regNo)) {
+                    return { success: false, message: `Cannot qualify: Student must clear previous round (${prevPhase.name}) first.` };
+                }
+            }
+            if (!phase.completions.includes(regNo)) {
+                phase.completions.push(regNo);
+            }
+        } else {
+            // Eliminate from subsequent phases automatically
+            phase.completions = phase.completions.filter(x => x !== regNo);
+            for (let i = phaseIndex + 1; i < activity.phases.length; i++) {
+                activity.phases[i].completions = (activity.phases[i].completions || []).filter(x => x !== regNo);
+            }
+        }
+        
+        this.sync("Activity", activity);
+        return { success: true, message: 'Phase qualification updated.' };
+    }
+
+    getStudentAttendance(regNo) {
+        const student = this.cache.students.find(s => s.registerNumber === regNo);
+        if (!student) return [];
+        
+        return this.cache.trainingPrograms.map(p => {
+            const isRegistered = (p.registrations || []).includes(regNo);
+            const myBatch = (p.batches || []).find(b => (b.students || []).includes(regNo));
+            
+            const studentSessions = (p.sessions || []).filter(s => {
+                if (!s.batchId) return true;
+                return myBatch && s.batchId === myBatch.id;
+            }).map(s => {
+                return {
+                    id: s.id,
+                    date: s.date,
+                    time: s.time,
+                    venue: s.venue,
+                    present: (s.attendance || []).includes(regNo)
+                };
+            });
+
+            const scores = student.scores || {};
+            const score = scores[p.id];
+
+            return {
+                id: p.id,
+                name: p.name,
+                isRegistered,
+                sessions: studentSessions,
+                score: score
+            };
+        });
+    }
+
+    registerForProgram(programId, regNo) {
+        const index = this.cache.trainingPrograms.findIndex(p => p.id === programId);
+        if (index === -1) return { success: false, message: 'Program not found.' };
+        const program = this.cache.trainingPrograms[index];
+        program.registrations = program.registrations || [];
+        if (program.registrations.includes(regNo)) {
+            return { success: false, message: 'You are already registered.' };
+        }
+        program.registrations.push(regNo);
+        this.sync("Training Program", program);
+        return { success: true, message: 'Successfully registered for program.' };
+    }
+
+    submitTrainingFeedback(programId, regNo, feedback) {
+        const index = this.cache.trainingPrograms.findIndex(p => p.id === programId);
+        if (index === -1) return { success: false, message: 'Program not found.' };
+        const program = this.cache.trainingPrograms[index];
+        program.feedbacks = program.feedbacks || [];
+        program.feedbacks = program.feedbacks.filter(f => f.studentId !== regNo);
+        program.feedbacks.push({
+            studentId: regNo,
+            rating: Number(feedback.rating),
+            comment: feedback.comment,
+            date: new Date().toISOString().split('T')[0]
+        });
+        this.sync("Training Program", program);
+        return { success: true, message: 'Feedback submitted successfully.' };
     }
 
     // Store a per-program score for a student (used by MCQ + external marks upload)

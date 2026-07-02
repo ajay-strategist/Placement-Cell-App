@@ -19,14 +19,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         submitBtn.textContent = 'Login';
         submitBtn.disabled = false;
     }
-
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
-            const role = document.getElementById('role').value;
+            let role = document.getElementById('role').value;
 
             if (!username || !password) {
                 showAlert('Please fill in all fields.', 'danger');
@@ -36,6 +35,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const response = db.validateLogin(username, password, role);
 
             if (response.success) {
+                // Automatically route to coordinator portal if student is coordinator
+                if (role === 'student' && (response.user.isCoordinator === true || response.user.isCoordinator === 'true')) {
+                    role = 'studentCoordinator';
+                }
+
                 sessionStorage.setItem('currentUser', JSON.stringify(response.user));
                 sessionStorage.setItem('userRole', role);
                 sessionStorage.setItem('userName', response.user.name || response.user.regNo || username);

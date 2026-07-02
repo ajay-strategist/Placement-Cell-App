@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Update UI title and header info
     const sidebarBrand = document.querySelector('.sidebar-brand');
     const userNameEl = document.querySelector('.user-name');
+    const userRoleEl = document.querySelector('.user-role');
     const userAvatarEl = document.querySelector('.user-avatar');
 
     if (userRole === 'studentCoordinator') {
@@ -19,6 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             sidebarBrand.href = 'coordinator.html';
         }
         if (userNameEl) userNameEl.textContent = `Welcome, ${currentUser.name || 'Coordinator'}`;
+        if (userRoleEl) userRoleEl.textContent = 'Student Coordinator';
         if (userAvatarEl) userAvatarEl.textContent = (currentUser.name || 'C')[0];
 
         // Hide User Management link from sidebar
@@ -41,11 +43,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelectorAll('.admin-only-field').forEach(el => el.style.setProperty('display', 'none', 'important'));
     } else if (userRole === 'teacherCoordinator') {
         if (sidebarBrand) {
-            sidebarBrand.textContent = 'Teacher Coordinator';
+            sidebarBrand.textContent = 'Teacher Coordinator Portal';
             sidebarBrand.href = 'admin.html';
         }
         if (userNameEl) userNameEl.textContent = `Welcome, ${currentUser.name || 'Coordinator'}`;
+        if (userRoleEl) userRoleEl.textContent = 'Teacher Coordinator';
         if (userAvatarEl) userAvatarEl.textContent = (currentUser.name || 'T')[0];
+
+        // Hide Manage Teachers subtab button
+        const teacherTabBtn = document.querySelector('[data-subtab="teachersSubTab"]');
+        if (teacherTabBtn) teacherTabBtn.style.display = 'none';
+        const addTeacherBtn = document.getElementById('toggleAddTeacherBtn');
+        if (addTeacherBtn) addTeacherBtn.style.display = 'none';
 
         // Hide admin-only fields like Promote to Coordinator in modals
         document.querySelectorAll('.admin-only-field').forEach(el => el.style.setProperty('display', 'none', 'important'));
@@ -55,6 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             sidebarBrand.href = 'admin.html';
         }
         if (userNameEl) userNameEl.textContent = 'Welcome, Admin';
+        if (userRoleEl) userRoleEl.textContent = 'Admin';
         if (userAvatarEl) userAvatarEl.textContent = 'A';
     }
 
@@ -577,7 +587,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     addTeacherForm.addEventListener('submit', (e) => {
         e.preventDefault();
         
-        if (!Permissions.can(userRole, 'edit_people')) {
+        if (!Permissions.can(userRole, 'edit_teachers')) {
             alert("Permission denied.");
             return;
         }
@@ -615,7 +625,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     window.deleteTeacher = (phoneNo) => {
-        if (!Permissions.can(userRole, 'edit_people')) {
+        if (!Permissions.can(userRole, 'edit_teachers')) {
             alert("Permission denied.");
             return;
         }
@@ -652,6 +662,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
+        const canEdit = Permissions.can(userRole, 'edit_teachers');
         filteredTeachers.forEach(t => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -660,6 +671,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td>${t.mailId}</td>
                 <td>${t.department}</td>
                 <td>
+                    ${canEdit ? `
                     <div class="d-flex gap-2">
                         <button class="btn btn-secondary btn-sm" onclick="editTeacher('${t.phoneNumber}')" title="Edit">
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
@@ -671,6 +683,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                         </button>
                     </div>
+                    ` : '<span class="text-muted small">view only</span>'}
                 </td>
             `;
             tbody.appendChild(tr);
@@ -680,7 +693,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Edit Teacher Function
     let editingTeacherPhone = null;
     window.editTeacher = (phoneNo) => {
-        if (!Permissions.can(userRole, 'edit_people')) {
+        if (!Permissions.can(userRole, 'edit_teachers')) {
             alert("Permission denied.");
             return;
         }
@@ -706,7 +719,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Reset Teacher Password
     window.resetTeacherPassword = (phoneNo) => {
-        if (!Permissions.can(userRole, 'edit_people')) {
+        if (!Permissions.can(userRole, 'edit_teachers')) {
             alert("Permission denied.");
             return;
         }
@@ -880,12 +893,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <small class="${p.isRegistrationOpen ? 'text-success' : 'text-danger'}">${p.isRegistrationOpen ? 'Registration Open' : 'Registration Closed'}</small><br>
                     <small class="${p.isFeedbackOpen ? 'text-success' : 'text-danger'}">${p.isFeedbackOpen ? '💬 Feedback Enabled' : '💬 Feedback Disabled'}</small>
                 </td>
-                <td><strong style="font-size:1rem;">${st.registered}</strong></td>
-                <td><span style="color:#16a34a;font-weight:700;">${st.attended}</span></td>
-                <td><span style="color:#dc2626;font-weight:700;">${st.notAttended}</span></td>
-                <td><span style="color:#0891b2;font-weight:700;">${st.completed}</span></td>
-                <td>
-                    <div class="d-flex gap-1 flex-wrap">
+                <td class="text-center"><strong style="font-size:1rem;">${st.registered}</strong></td>
+                <td class="text-center"><span style="color:#16a34a;font-weight:700;">${st.attended}</span></td>
+                <td class="text-center"><span style="color:#dc2626;font-weight:700;">${st.notAttended}</span></td>
+                <td class="text-center"><span style="color:#0891b2;font-weight:700;">${st.completed}</span></td>
+                <td style="white-space:nowrap; width:1%;">
+                    <div class="d-flex gap-1">
                         <button class="btn btn-secondary btn-sm" onclick="location.href='manage-training.html?id=${p.id}'" title="Manage Sessions">Manage</button>
                         ${Permissions.can(userRole, 'edit_training_drives') ? `
                         <button class="btn btn-secondary btn-sm" onclick="editTrainingProgram('${p.id}')" title="Edit Info">
@@ -1895,7 +1908,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         editingPhaseId = id;
         const p = currentActivity.phases.find(phase => phase.id === id);
         document.getElementById('phaseName').value = p.name;
-        document.getElementById('phaseDesc').innerHTML = p.description;
+        document.getElementById('phaseDesc').innerHTML = p.description || '';
         document.getElementById('phaseLastDate').value = p.lastDate;
         const radios = document.querySelectorAll('input[name="phaseMode"]');
         radios.forEach(r => { if(r.value === p.mode) r.checked = true; });
@@ -2193,14 +2206,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         const courseF = (document.getElementById('classCourseFilter') || {}).value || '';
         const deptF = (document.getElementById('classDeptFilter') || {}).value || '';
         const yearF = (document.getElementById('classYearFilter') || {}).value || '';
+        
         const filtered = students.filter(s => {
             if (courseF && s.course !== courseF) return false;
             if (deptF && s.department !== deptF) return false;
             if (yearF && yearFromClass(s.class) !== yearF) return false;
             return s.class && String(s.class).trim();
         });
+        
         const groups = {};
-        filtered.forEach(s => { (groups[s.class] = groups[s.class] || []).push(s); });
+        
+        // Seed groups with all known classes in db.getClassIncharges()
+        const incharges = db.getClassIncharges();
+        incharges.forEach(c => {
+            if (c.className && String(c.className).trim()) {
+                const hasMatch = students.some(s => s.class === c.className && 
+                    (!courseF || s.course === courseF) && 
+                    (!deptF || s.department === deptF) && 
+                    (!yearF || yearFromClass(s.class) === yearF)
+                );
+                
+                if (!courseF && !deptF && !yearF) {
+                    groups[c.className] = [];
+                } else if (hasMatch) {
+                    groups[c.className] = [];
+                }
+            }
+        });
+
+        // Now populate groups with filtered students
+        filtered.forEach(s => { 
+            groups[s.class] = groups[s.class] || [];
+            groups[s.class].push(s); 
+        });
+        
         return groups;
     }
 
@@ -2225,7 +2264,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const container = document.getElementById('classCards');
         const classNames = Object.keys(groups).sort();
         if (classNames.length === 0) {
-            container.innerHTML = '<p class="text-muted">No classes found. Add a Class/Section to students (in User Management or via Excel upload) to populate this view.</p>';
+            container.innerHTML = '<p class="text-muted">No classes found. Click "+ Create Class" above or add a Class/Section to students to populate this view.</p>';
             return;
         }
         container.innerHTML = classNames.map(cn => {
@@ -2235,24 +2274,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             const incharge = db.getClassIncharge(cn) || '—';
             const safe = cn.replace(/'/g, "\\'");
             return `
-                <div class="dash-chart-card">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
+                <div class="class-card-premium">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
                         <div>
-                            <h4 style="margin:0; color:#111827; font-size:1.05rem;">${cn}</h4>
-                            <small class="text-muted">Incharge: <strong id="inch_${btoa(cn).replace(/=/g,'')}">${incharge}</strong>
-                                <a href="#" onclick="editClassIncharge('${safe}');return false;" style="margin-left:6px; font-size:0.75rem;">✏️ edit</a>
+                            <h4 style="margin:0; color:#0f172a; font-weight: 800; font-size:1.15rem; letter-spacing:-0.02em;">${cn}</h4>
+                            <small class="text-muted" style="font-size:0.82rem; margin-top:0.25rem; display:block;">Incharge: <strong id="inch_${btoa(cn).replace(/=/g,'')}" style="color:#475569;">${incharge}</strong>
+                                <a href="#" onclick="editClassIncharge('${safe}');return false;" style="margin-left:6px; font-size:0.75rem; color:#2563eb; font-weight:600; text-decoration:none;">✏️ edit</a>
                             </small>
                         </div>
-                        <span class="badge bg-primary" style="font-size:0.8rem;">${list.length} students</span>
+                        <span class="badge" style="background:#eff6ff; color:#2563eb; font-weight:700; font-size:0.8rem; padding:6px 12px; border-radius:8px;">${list.length} students</span>
                     </div>
-                    <div class="d-flex gap-2 mb-3" style="flex-wrap:wrap;">
-                        <span class="status-pill status-qualified">Registered: ${reg}</span>
-                        <span class="status-pill status-pending">Attended: ${att}</span>
-                        <span class="status-pill status-dropped">Not Attended: ${notAtt}</span>
+                    <div class="d-flex gap-2 mb-4" style="flex-wrap:wrap;">
+                        <span class="status-pill status-qualified" style="background:#ecfdf5; color:#065f46; font-weight:600; border-radius:6px; font-size:0.75rem;">Registered: ${reg}</span>
+                        <span class="status-pill status-pending" style="background:#fffbeb; color:#92400e; font-weight:600; border-radius:6px; font-size:0.75rem;">Attended: ${att}</span>
+                        <span class="status-pill status-dropped" style="background:#fef2f2; color:#991b1b; font-weight:600; border-radius:6px; font-size:0.75rem;">Not Attended: ${notAtt}</span>
                     </div>
                     <div class="d-flex gap-2">
-                        <button class="btn btn-primary btn-sm" onclick="classReport1('${safe}')">Report 1 · Students</button>
-                        <button class="btn btn-secondary btn-sm" onclick="classReport2('${safe}')">Report 2 · Programs</button>
+                        <button class="btn btn-primary btn-sm" onclick="classReport1('${safe}')" style="font-weight:600; border-radius:8px; padding:6px 12px; font-size:0.78rem;">Report 1 · Students</button>
+                        <button class="btn btn-secondary btn-sm" onclick="classReport2('${safe}')" style="font-weight:600; border-radius:8px; padding:6px 12px; font-size:0.78rem;">Report 2 · Programs</button>
                     </div>
                 </div>`;
         }).join('');
@@ -2265,6 +2304,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             db.setClassIncharge(className, name.trim());
             renderClassView();
         }
+    };
+
+    window.openCreateClassModal = function() {
+        const className = prompt("Enter new Class Name (e.g. 1 BCA A):");
+        if (!className || !className.trim()) return;
+        
+        const incharge = prompt(`Enter Class Incharge Name for "${className.trim()}":`);
+        db.setClassIncharge(className.trim(), (incharge || '').trim());
+        renderClassView();
     };
 
     function openClassModal(title, html) {

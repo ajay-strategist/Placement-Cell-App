@@ -15,7 +15,9 @@
 <body>
     <div class="app-container">
         <aside class="sidebar">
-            <div class="college-logo-placeholder" style="margin-bottom: 1rem;">CC</div>
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; width: 100%; overflow: hidden; padding: 0 10px;">
+                <img src="LogoIcon.png" alt="College Logo" style="width: 100%; max-width: 80px; height: auto; object-fit: contain;">
+            </div>
             <a href="#" class="sidebar-brand">Admin Portal</a>
             <ul class="sidebar-nav">
                 <li>
@@ -294,22 +296,15 @@
                 </div>
 
                 <!-- Student Modal (Pop-up) -->
-                <div id="studentModal" class="hidden premium-ui" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
-                    <div class="glass-card" style="width: 700px; max-width: 95vw; background: white; overflow: hidden; padding: 0; border: none; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
-                        <!-- Colorful Banner -->
-                        <div style="background: linear-gradient(135deg, #0a0f1c 0%, #0D6EFC 100%); padding: 2.5rem 2rem; color: white; position: relative;">
-                            <div style="position: relative; z-index: 1;">
-                                <h2 id="studentModalTitle" style="margin: 0; font-size: 1.75rem; font-weight: 800; color: white; letter-spacing: -0.025em;">Add New Student</h2>
-                                <p style="margin: 0.5rem 0 0; opacity: 0.9; font-size: 0.95rem; font-weight: 400;">Create a new student profile for placement tracking.</p>
-                            </div>
-                            <!-- Decorative Circle -->
-                            <div style="position: absolute; top: -20px; right: -20px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
-                            <button class="btn" id="closeStudentModalBtn" style="position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.3s; padding: 0;">✕</button>
+                <div id="studentModal" class="premium-modal-wrapper hidden">
+                    <div class="premium-modal-card">
+                        <div class="premium-modal-header">
+                            <h2 id="studentModalTitle">Add New Student</h2>
+                            <p id="studentModalSubtitle">Create a new student profile for placement tracking.</p>
+                            <button type="button" class="premium-modal-close-btn" id="closeStudentModalBtn">✕</button>
                         </div>
-                        
-                        <!-- Form Body -->
-                        <div style="padding: 2.5rem 2rem;">
-                            <form id="addStudentForm">
+                        <form id="addStudentForm" class="premium-modal-form">
+                            <div class="premium-modal-body">
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                                     <div class="form-group mb-0">
                                         <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">FULL NAME</label>
@@ -352,17 +347,16 @@
                                         <input type="password" id="sPass" class="form-control" required placeholder="••••••••" style="background: #f9fafb; border-color: #e5e7eb;">
                                     </div>
                                 </div>
-                                <!-- Admin-only: Coordinator promotion -->
                                 <div class="admin-only-field mt-3 d-flex align-items-center gap-2" style="padding: 0.75rem 1rem; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;">
                                     <input type="checkbox" id="sIsCoordinator" style="width: 16px; height: 16px; cursor: pointer;">
                                     <label for="sIsCoordinator" style="font-weight: 600; font-size: 0.85rem; color: #92400e; cursor: pointer; margin: 0;">⭐ Promote to Student Coordinator</label>
                                 </div>
-                                <div class="mt-5 d-flex gap-3 justify-content-end">
-                                    <button type="button" class="btn btn-secondary" id="cancelAddStudentBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
-                                    <button type="submit" id="saveStudentBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Save Student Profile</button>
-                                </div>
-                            </form>
-                        </div>
+                            </div>
+                            <div class="premium-modal-footer">
+                                <button type="button" class="btn btn-secondary" id="cancelAddStudentBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
+                                <button type="submit" id="saveStudentBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Save Student Profile</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
@@ -415,22 +409,15 @@
                 <div id="teacherAlert" class="alert hidden mb-3"></div>
 
                 <!-- Teacher Modal (Pop-up) -->
-                <div id="teacherModal" class="hidden premium-ui" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
-                    <div class="glass-card" style="width: 600px; max-width: 95vw; background: white; overflow: hidden; padding: 0; border: none; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
-                        <!-- Colorful Banner -->
-                        <div style="background: linear-gradient(135deg, #0a0f1c 0%, #0D6EFC 100%); padding: 2.5rem 2rem; color: white; position: relative;">
-                            <div style="position: relative; z-index: 1;">
-                                <h2 id="teacherModalTitle" style="margin: 0; font-size: 1.75rem; font-weight: 800; color: white; letter-spacing: -0.025em;">Add New Teacher</h2>
-                                <p style="margin: 0.5rem 0 0; opacity: 0.9; font-size: 0.95rem; font-weight: 400;">Set up a new instructor profile for the portal.</p>
-                            </div>
-                            <!-- Decorative Circle -->
-                            <div style="position: absolute; top: -20px; right: -20px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
-                            <button class="btn" id="closeTeacherModalBtn" style="position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.3s; padding: 0;">✕</button>
+                <div id="teacherModal" class="premium-modal-wrapper hidden">
+                    <div class="premium-modal-card" style="width: 600px;">
+                        <div class="premium-modal-header">
+                            <h2 id="teacherModalTitle">Add New Teacher</h2>
+                            <p id="teacherModalSubtitle">Set up a new instructor profile for the portal.</p>
+                            <button type="button" class="premium-modal-close-btn" id="closeTeacherModalBtn">✕</button>
                         </div>
-                        
-                        <!-- Form Body -->
-                        <div style="padding: 2.5rem 2rem;">
-                            <form id="addTeacherForm">
+                        <form id="addTeacherForm" class="premium-modal-form">
+                            <div class="premium-modal-body">
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                                     <div class="form-group mb-0">
                                         <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">FULL NAME</label>
@@ -453,17 +440,16 @@
                                         <input type="password" id="tPass" class="form-control" required placeholder="••••••••" style="background: #f9fafb; border-color: #e5e7eb;">
                                     </div>
                                 </div>
-                                <!-- Admin-only: Coordinator promotion -->
                                 <div class="admin-only-field mt-3 d-flex align-items-center gap-2" style="padding: 0.75rem 1rem; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;">
                                     <input type="checkbox" id="tIsCoordinator" style="width: 16px; height: 16px; cursor: pointer;">
                                     <label for="tIsCoordinator" style="font-weight: 600; font-size: 0.85rem; color: #92400e; cursor: pointer; margin: 0;">⭐ Promote to Teacher Coordinator</label>
                                 </div>
-                                <div class="mt-5 d-flex gap-3 justify-content-end">
-                                    <button type="button" class="btn btn-secondary" id="cancelAddTeacherBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
-                                    <button type="submit" id="saveTeacherBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Save Teacher Profile</button>
-                                </div>
-                            </form>
-                        </div>
+                            </div>
+                            <div class="premium-modal-footer">
+                                <button type="button" class="btn btn-secondary" id="cancelAddTeacherBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
+                                <button type="submit" id="saveTeacherBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Save Teacher Profile</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
@@ -519,22 +505,15 @@
                 <div id="trainingAlert" class="alert hidden mb-3"></div>
 
                 <!-- Training Modal (Pop-up) -->
-                <div id="trainingModal" class="hidden premium-ui" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
-                    <div class="glass-card" style="width: 700px; max-width: 95vw; background: white; overflow: hidden; padding: 0; border: none; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
-                        <!-- Colorful Banner -->
-                        <div style="background: linear-gradient(135deg, #0a0f1c 0%, #0D6EFC 100%); padding: 2.5rem 2rem; color: white; position: relative;">
-                            <div style="position: relative; z-index: 1;">
-                                <h2 id="trainingModalTitle" style="margin: 0; font-size: 1.75rem; font-weight: 800; color: white; letter-spacing: -0.025em;">Create New Training Program</h2>
-                                <p style="margin: 0.5rem 0 0; opacity: 0.9; font-size: 0.95rem; font-weight: 400;">Schedule and manage a new training activity.</p>
-                            </div>
-                            <!-- Decorative Circle -->
-                            <div style="position: absolute; top: -20px; right: -20px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
-                            <button class="btn" id="closeTrainingModalBtn" style="position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.3s; padding: 0;">✕</button>
+                <div id="trainingModal" class="premium-modal-wrapper hidden">
+                    <div class="premium-modal-card">
+                        <div class="premium-modal-header">
+                            <h2 id="trainingModalTitle">Create New Training Program</h2>
+                            <p id="trainingModalSubtitle">Schedule and manage a new training activity.</p>
+                            <button type="button" class="premium-modal-close-btn" id="closeTrainingModalBtn">✕</button>
                         </div>
-                        
-                        <!-- Form Body -->
-                        <div style="padding: 2.5rem 2rem; max-height: 70vh; overflow-y: auto;">
-                            <form id="addTrainingForm">
+                        <form id="addTrainingForm" class="premium-modal-form">
+                            <div class="premium-modal-body">
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                                     <div class="form-group mb-0">
                                         <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">PROGRAM NAME</label>
@@ -598,12 +577,12 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mt-5 d-flex gap-3 justify-content-end">
-                                    <button type="button" class="btn btn-secondary" id="cancelAddTrainingBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
-                                    <button type="submit" id="saveTrainingBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Create Program</button>
-                                </div>
-                            </form>
-                        </div>
+                            </div>
+                            <div class="premium-modal-footer">
+                                <button type="button" class="btn btn-secondary" id="cancelAddTrainingBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
+                                <button type="submit" id="saveTrainingBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Create Program</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
@@ -665,9 +644,12 @@
             <!-- Class Tab -->
             <div id="classViewTab" class="tab-content premium-ui">
                 <div class="glass-card mb-4">
-                    <div class="mb-3">
-                        <h3 style="margin-bottom:0.25rem; color:#111827; font-size:1.25rem;">Classes</h3>
-                        <p style="color:#6b7280; font-size:0.875rem; margin:0;">Class-wise student tracking across all training programs.</p>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h3 style="margin-bottom:0.25rem; color:#111827; font-size:1.25rem;">Classes</h3>
+                            <p style="color:#6b7280; font-size:0.875rem; margin:0;">Class-wise student tracking across all training programs.</p>
+                        </div>
+                        <button class="btn btn-primary btn-sm" id="createClassBtn" onclick="openCreateClassModal()" style="font-weight: 600; padding: 0.5rem 1.25rem; border-radius: 8px;">+ Create Class</button>
                     </div>
                     <div class="d-flex align-items-end gap-2 mb-4" style="flex-wrap:wrap;">
                         <div class="form-group mb-0" style="width:200px;">
@@ -713,7 +695,7 @@
                         <h4 style="margin:0; color:#fff;">Create MCQ Exam</h4>
                         <button class="btn" onclick="document.getElementById('examModal').classList.add('hidden')" style="background:rgba(255,255,255,0.2); color:#fff; border:none; border-radius:50%; width:34px; height:34px; padding:0;">✕</button>
                     </div>
-                    <div style="padding:1.5rem; overflow-y:auto;">
+                    <div style="padding:1.5rem; overflow-y:auto; flex:1; min-height:0;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
                             <div class="form-group mb-0"><label class="form-label">Exam Title</label><input id="exTitle" class="form-control" placeholder="e.g. Excel Basics Test"></div>
                             <div class="form-group mb-0"><label class="form-label">Linked Training Program</label><select id="exProgram" class="form-control"></select></div>
@@ -922,22 +904,15 @@
                 </div>
 
                 <!-- Placement Modal (Pop-up) -->
-                <div id="placementModal" class="hidden premium-ui" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
-                    <div class="glass-card" style="width: 700px; max-width: 95vw; background: white; overflow: hidden; padding: 0; border: none; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
-                        <!-- Colorful Banner -->
-                        <div style="background: linear-gradient(135deg, #0a0f1c 0%, #0D6EFC 100%); padding: 2.5rem 2rem; color: white; position: relative;">
-                            <div style="position: relative; z-index: 1;">
-                                <h2 id="placementModalTitle" style="margin: 0; font-size: 1.75rem; font-weight: 800; color: white; letter-spacing: -0.025em;">Create Placement Activity</h2>
-                                <p style="margin: 0.5rem 0 0; opacity: 0.9; font-size: 0.95rem; font-weight: 400;">Drive recruitment activities and track selection phases.</p>
-                            </div>
-                            <!-- Decorative Circle -->
-                            <div style="position: absolute; top: -20px; right: -20px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
-                            <button class="btn" id="closePlacementModalBtn" style="position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.3s; padding: 0;">✕</button>
+                <div id="placementModal" class="premium-modal-wrapper hidden">
+                    <div class="premium-modal-card">
+                        <div class="premium-modal-header">
+                            <h2 id="placementModalTitle">Create Placement Activity</h2>
+                            <p id="placementModalSubtitle">Drive recruitment activities and track selection phases.</p>
+                            <button type="button" class="premium-modal-close-btn" id="closePlacementModalBtn">✕</button>
                         </div>
-                        
-                        <!-- Form Body -->
-                        <div style="padding: 2.5rem 2rem; max-height: 70vh; overflow-y: auto;">
-                            <form id="addPlacementForm">
+                        <form id="addPlacementForm" class="premium-modal-form">
+                            <div class="premium-modal-body">
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                                     <div class="form-group mb-0">
                                         <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">ACTIVITY NAME</label>
@@ -991,12 +966,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="mt-5 d-flex gap-3 justify-content-end">
-                                    <button type="button" class="btn btn-secondary" id="cancelAddPlacementBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
-                                    <button type="submit" id="savePlacementBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Create Activity</button>
-                                </div>
-                            </form>
-                        </div>
+                            </div>
+                            <div class="premium-modal-footer">
+                                <button type="button" class="btn btn-secondary" id="cancelAddPlacementBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
+                                <button type="submit" id="savePlacementBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Create Activity</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                     </div>
                 </div>
 
@@ -1077,7 +1054,7 @@
                 <h4 id="classModalTitle" style="margin:0; color:#fff;">Class Report</h4>
                 <button class="btn" onclick="document.getElementById('classModal').classList.add('hidden')" style="background:rgba(255,255,255,0.2); color:#fff; border:none; border-radius:50%; width:34px; height:34px; padding:0;">✕</button>
             </div>
-            <div id="classModalBody" style="padding:1.5rem; overflow-y:auto;"></div>
+            <div id="classModalBody" style="padding:1.5rem; overflow-y:auto; flex:1; min-height:0;"></div>
         </div>
     </div>
 

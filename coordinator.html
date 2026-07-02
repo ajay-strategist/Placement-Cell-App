@@ -15,8 +15,10 @@
 <body class="premium-ui">
     <div class="app-container">
         <aside class="sidebar">
-            <div class="college-logo-placeholder" style="margin-bottom: 1rem;">CC</div>
-            <a href="#" class="sidebar-brand">Admin Portal</a>
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; width: 100%; overflow: hidden; padding: 0 10px;">
+                <img src="LogoIcon.png" alt="College Logo" style="width: 100%; max-width: 80px; height: auto; object-fit: contain;">
+            </div>
+            <a href="#" class="sidebar-brand">Coordinator Portal</a>
             <ul class="sidebar-nav">
                 <li>
                     <a class="sidebar-link tab active" data-tab="dashboard">
@@ -47,8 +49,11 @@
                         <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                         Placement Activities
                     </a>
+                <li class="mt-4">
+                    <a href="student.html" class="sidebar-link" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border-radius: 10px; display: flex; align-items: center; padding: 10px 15px; font-weight: 600;">
+                        🎓 Student Portal
+                    </a>
                 </li>
-
             </ul>
             <div class="sidebar-footer">
                 <a href="#" onclick="logout()" class="btn btn-danger w-100" style="padding: 0.5rem 1rem; font-size: 13px; border: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
@@ -282,22 +287,15 @@
                 </div>
 
                 <!-- Student Modal (Pop-up) -->
-                <div id="studentModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
-                    <div class="glass-card" style="width: 700px; max-width: 95vw; background: white; overflow: hidden; padding: 0; border: none; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
-                        <!-- Colorful Banner -->
-                        <div style="background: linear-gradient(135deg, #0a0f1c 0%, #0D6EFC 100%); padding: 2.5rem 2rem; color: white; position: relative;">
-                            <div style="position: relative; z-index: 1;">
-                                <h2 id="studentModalTitle" style="margin: 0; font-size: 1.75rem; font-weight: 800; color: white; letter-spacing: -0.025em;">Add New Student</h2>
-                                <p style="margin: 0.5rem 0 0; opacity: 0.9; font-size: 0.95rem; font-weight: 400;">Create a new student profile for placement tracking.</p>
-                            </div>
-                            <!-- Decorative Circle -->
-                            <div style="position: absolute; top: -20px; right: -20px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
-                            <button class="btn" id="closeStudentModalBtn" style="position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.3s; padding: 0;">✕</button>
+                <div id="studentModal" class="premium-modal-wrapper hidden">
+                    <div class="premium-modal-card">
+                        <div class="premium-modal-header">
+                            <h2 id="studentModalTitle">Add New Student</h2>
+                            <p id="studentModalSubtitle">Create a new student profile for placement tracking.</p>
+                            <button type="button" class="premium-modal-close-btn" id="closeStudentModalBtn">✕</button>
                         </div>
-                        
-                        <!-- Form Body -->
-                        <div style="padding: 2.5rem 2rem;">
-                            <form id="addStudentForm">
+                        <form id="addStudentForm" class="premium-modal-form">
+                            <div class="premium-modal-body">
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                                     <div class="form-group mb-0">
                                         <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">FULL NAME</label>
@@ -324,6 +322,10 @@
                                         <input type="text" id="sDept" class="form-control" required placeholder="e.g. Computer Science" style="background: #f9fafb; border-color: #e5e7eb;">
                                     </div>
                                     <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">CLASS / SECTION</label>
+                                        <input type="text" id="sClass" class="form-control" placeholder="e.g. 1 BCA A" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
                                         <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">GENDER</label>
                                         <select id="sGender" class="form-control" required style="background: #f9fafb; border-color: #e5e7eb;">
                                             <option value="Male">Male</option>
@@ -336,17 +338,18 @@
                                         <input type="password" id="sPass" class="form-control" required placeholder="••••••••" style="background: #f9fafb; border-color: #e5e7eb;">
                                     </div>
                                 </div>
-                                <!-- Admin-only: Coordinator promotion -->
                                 <div class="admin-only-field mt-3 d-flex align-items-center gap-2" style="padding: 0.75rem 1rem; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;">
                                     <input type="checkbox" id="sIsCoordinator" style="width: 16px; height: 16px; cursor: pointer;">
                                     <label for="sIsCoordinator" style="font-weight: 600; font-size: 0.85rem; color: #92400e; cursor: pointer; margin: 0;">⭐ Promote to Student Coordinator</label>
                                 </div>
-                                <div class="mt-5 d-flex gap-3 justify-content-end">
-                                    <button type="button" class="btn btn-secondary" id="cancelAddStudentBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
-                                    <button type="submit" id="saveStudentBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Save Student Profile</button>
-                                </div>
-                            </form>
-                        </div>
+                            </div>
+                            <div class="premium-modal-footer">
+                                <button type="button" class="btn btn-secondary" id="cancelAddStudentBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
+                                <button type="submit" id="saveStudentBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Save Student Profile</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                     </div>
                 </div>
 
@@ -399,22 +402,15 @@
                 <div id="teacherAlert" class="alert hidden mb-3"></div>
 
                 <!-- Teacher Modal (Pop-up) -->
-                <div id="teacherModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px);">
-                    <div class="glass-card" style="width: 600px; max-width: 95vw; background: white; overflow: hidden; padding: 0; border: none; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
-                        <!-- Colorful Banner -->
-                        <div style="background: linear-gradient(135deg, #0a0f1c 0%, #0D6EFC 100%); padding: 2.5rem 2rem; color: white; position: relative;">
-                            <div style="position: relative; z-index: 1;">
-                                <h2 id="teacherModalTitle" style="margin: 0; font-size: 1.75rem; font-weight: 800; color: white; letter-spacing: -0.025em;">Add New Teacher</h2>
-                                <p style="margin: 0.5rem 0 0; opacity: 0.9; font-size: 0.95rem; font-weight: 400;">Set up a new instructor profile for the portal.</p>
-                            </div>
-                            <!-- Decorative Circle -->
-                            <div style="position: absolute; top: -20px; right: -20px; width: 150px; height: 150px; background: rgba(255,255,255,0.1); border-radius: 50%;"></div>
-                            <button class="btn" id="closeTeacherModalBtn" style="position: absolute; top: 1.25rem; right: 1.25rem; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.3s; padding: 0;">✕</button>
+                <div id="teacherModal" class="premium-modal-wrapper hidden">
+                    <div class="premium-modal-card" style="width: 600px;">
+                        <div class="premium-modal-header">
+                            <h2 id="teacherModalTitle">Add New Teacher</h2>
+                            <p id="teacherModalSubtitle">Set up a new instructor profile for the portal.</p>
+                            <button type="button" class="premium-modal-close-btn" id="closeTeacherModalBtn">✕</button>
                         </div>
-                        
-                        <!-- Form Body -->
-                        <div style="padding: 2.5rem 2rem;">
-                            <form id="addTeacherForm">
+                        <form id="addTeacherForm" class="premium-modal-form">
+                            <div class="premium-modal-body">
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                                     <div class="form-group mb-0">
                                         <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">FULL NAME</label>
@@ -437,17 +433,18 @@
                                         <input type="password" id="tPass" class="form-control" required placeholder="••••••••" style="background: #f9fafb; border-color: #e5e7eb;">
                                     </div>
                                 </div>
-                                <!-- Admin-only: Coordinator promotion -->
                                 <div class="admin-only-field mt-3 d-flex align-items-center gap-2" style="padding: 0.75rem 1rem; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;">
                                     <input type="checkbox" id="tIsCoordinator" style="width: 16px; height: 16px; cursor: pointer;">
                                     <label for="tIsCoordinator" style="font-weight: 600; font-size: 0.85rem; color: #92400e; cursor: pointer; margin: 0;">⭐ Promote to Teacher Coordinator</label>
                                 </div>
-                                <div class="mt-5 d-flex gap-3 justify-content-end">
-                                    <button type="button" class="btn btn-secondary" id="cancelAddTeacherBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
-                                    <button type="submit" id="saveTeacherBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Save Teacher Profile</button>
-                                </div>
-                            </form>
-                        </div>
+                            </div>
+                            <div class="premium-modal-footer">
+                                <button type="button" class="btn btn-secondary" id="cancelAddTeacherBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
+                                <button type="submit" id="saveTeacherBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Save Teacher Profile</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                     </div>
                 </div>
 

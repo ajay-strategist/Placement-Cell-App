@@ -6,6 +6,7 @@ const Permissions = {
         admin: {
             manage_users: true,
             edit_people: true,
+            edit_teachers: true,
             bulk_upload: true,
             edit_training_drives: true,
             manage_sessions: true,
@@ -17,6 +18,7 @@ const Permissions = {
         teacherCoordinator: {
             manage_users: false,
             edit_people: true,
+            edit_teachers: false,
             bulk_upload: true,
             edit_training_drives: true,
             manage_sessions: true,
