@@ -8,6 +8,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userRole = sessionStorage.getItem('userRole') || 'admin';
     const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
 
+    // Modal transition helpers
+    window.openModal = function(modal) {
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        modal.style.opacity = '0';
+        modal.offsetHeight; // Force reflow
+        modal.style.opacity = '1';
+    };
+
+    window.closeModal = function(modal) {
+        if (!modal) return;
+        modal.style.opacity = '0';
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 250);
+    };
+
+    window.animateCount = function(elementId, endValue) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        const end = parseInt(endValue) || 0;
+        if (end === 0) { el.textContent = '0'; return; }
+        let start = 0;
+        const duration = 800;
+        const startTime = performance.now();
+        
+        function update(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const ease = progress * (2 - progress);
+            const current = Math.floor(ease * end);
+            el.textContent = current;
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            } else {
+                el.textContent = end;
+            }
+        }
+        requestAnimationFrame(update);
+    };
+
     // Update UI title and header info
     const sidebarBrand = document.querySelector('.sidebar-brand');
     const userNameEl = document.querySelector('.user-name');
@@ -1459,11 +1500,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const placementActivities = activities.filter(a => a.type === 'placement' || !a.type);
         const recruitmentActivities = activities.filter(a => a.type === 'recruitment');
 
-        // Top 4 Metrics
-        document.getElementById('dashTotalStudents').textContent = students.length;
-        document.getElementById('dashTotalTrainings').textContent = programs.length;
-        document.getElementById('dashTotalActivities').textContent = placementActivities.length;
-        document.getElementById('dashTotalRecruitments').textContent = recruitmentActivities.length;
+        // Top 4 Metrics (animated count-up)
+        window.animateCount('dashTotalStudents', students.length);
+        window.animateCount('dashTotalTrainings', programs.length);
+        window.animateCount('dashTotalActivities', placementActivities.length);
+        window.animateCount('dashTotalRecruitments', recruitmentActivities.length);
 
         // Placement Status Logic
         let placedSet = new Set();
@@ -2383,18 +2424,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         </table></div>`;
     };
 
-    // ==========================================
+    // =====================================================================
     // --- MCQ Exam Engine (admin authoring) ---
-    // ==========================================
+    // =====================================================================
     const canAuthorExams = (userRole === 'admin' || userRole === 'teacherCoordinator');
+    let editingExamId = null;
+    let activeReportExamId = null;
+
+    function getTargetLabel(target) {
+        if (!target || target.type === 'all') return 'All students';
+        const parts = [];
+        if (target.courses && target.courses.length > 0) {
+            parts.push(`Courses: ${target.courses.join(', ')}`);
+        }
+        if (target.classes && target.classes.length > 0) {
+            parts.push(`Classes: ${target.classes.join(', ')}`);
+        }
+        return parts.join(' | ') || 'All students';
+    }
 
     window.renderMCQ = function () {
-        // studentCoordinator can view but not create/upload
         const btns = document.getElementById('mcqActionBtns');
         if (btns) btns.style.display = canAuthorExams ? '' : 'none';
 
         const exams = db.getExams();
-        const programs = db.getTrainingPrograms();
         const tbody = document.querySelector('#examTable tbody');
         if (!tbody) return;
         if (exams.length === 0) {
@@ -2402,31 +2455,59 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         tbody.innerHTML = exams.map(e => {
-            const prog = programs.find(p => p.id === e.programId);
             const total = (e.questions || []).reduce((a, q) => a + (Number(q.marks) || 0), 0);
+            const targetLabel = getTargetLabel(e.target);
             return `<tr>
                 <td><strong>${e.title}</strong></td>
-                <td>${prog ? prog.name : '<span class="text-muted">—</span>'}</td>
+                <td>${targetLabel}</td>
                 <td>${(e.questions || []).length}</td>
                 <td>${total}</td>
-                <td>${e.passMark}</td>
-                <td>${e.duration} min</td>
-                <td>${canAuthorExams ? `<button class="btn btn-danger btn-sm" onclick="deleteExam('${e.id}')">Delete</button>` : '<span class="text-muted small">view only</span>'}</td>
+                <td>${e.passMark}%</td>
+                <td>${e.duration ? `${e.duration} min` : 'Untimed'}</td>
+                <td>
+                    ${canAuthorExams ? `
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-secondary btn-sm" onclick="editExam('${e.id}')">Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteExam('${e.id}')">Delete</button>
+                            <button class="btn btn-primary btn-sm" onclick="viewExamReport('${e.id}')">Report</button>
+                        </div>
+                    ` : '<span class="text-muted small">view only</span>'}
+                </td>
             </tr>`;
         }).join('');
     };
 
     window.openExamBuilder = function () {
         if (!canAuthorExams) { alert('Permission denied.'); return; }
+        editingExamId = null;
         document.getElementById('exTitle').value = '';
         document.getElementById('exDuration').value = 20;
         document.getElementById('exPass').value = 40;
         document.getElementById('exNeg').value = 0;
-        const sel = document.getElementById('exProgram');
-        sel.innerHTML = db.getTrainingPrograms().map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+
+        // Populate course and class checkboxes
+        const students = db.getStudents();
+        const courses = [...new Set(students.map(s => s.course).filter(Boolean))].sort();
+        const classes = [...new Set(students.map(s => s.class || s.className).filter(Boolean))].sort();
+
+        const coursesDiv = document.getElementById('exCoursesContainer');
+        coursesDiv.innerHTML = courses.map(c => `
+            <label style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem; font-weight:normal; font-size:0.875rem;">
+                <input type="checkbox" class="ex-course-checkbox" value="${c}"> ${c}
+            </label>
+        `).join('') || '<span class="text-muted small">No courses available</span>';
+
+        const classesDiv = document.getElementById('exClassesContainer');
+        classesDiv.innerHTML = classes.map(cl => `
+            <label style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem; font-weight:normal; font-size:0.875rem;">
+                <input type="checkbox" class="ex-class-checkbox" value="${cl}"> ${cl}
+            </label>
+        `).join('') || '<span class="text-muted small">No classes available</span>';
+
         document.getElementById('examQuestions').innerHTML = '';
         addExamQuestion();
-        document.getElementById('examModal').classList.remove('hidden');
+        document.getElementById('examModalTitle').textContent = 'Create MCQ Exam';
+        openModal(document.getElementById('examModal'));
     };
 
     window.addExamQuestion = function () {
@@ -2450,6 +2531,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <input class="form-control q-marks" type="number" value="1" min="0" step="0.5" title="Marks">
             </div>
             <div class="q-options"></div>
+            <div class="form-group mb-0 mt-2">
+                <input class="form-control q-explanation" placeholder="Explanation (optional)">
+            </div>
         `;
         wrap.appendChild(div);
         renderQOptions(div, 'single');
@@ -2478,15 +2562,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderQOptions(sel.closest('[data-q]'), sel.value);
     };
 
-    window.saveExam = function () {
+    window.saveExam = async function () {
         const title = document.getElementById('exTitle').value.trim();
-        const programId = document.getElementById('exProgram').value;
         if (!title) { alert('Enter an exam title.'); return; }
+        
         const questions = [];
         document.querySelectorAll('#examQuestions [data-q]').forEach(div => {
             const text = div.querySelector('.q-text').value.trim();
             const type = div.querySelector('.q-type').value;
             const marks = Number(div.querySelector('.q-marks').value) || 1;
+            const explanation = div.querySelector('.q-explanation').value.trim();
             if (!text) return;
             let options = [], correct = [];
             if (type === 'truefalse') {
@@ -2501,69 +2586,240 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (options[i] !== undefined) correct.push(options[i]);
                 });
             }
-            if (options.length && correct.length) questions.push({ text, type, marks, options, correct });
+            if (options.length && correct.length) {
+                questions.push({ text, type, marks, options, correct, explanation });
+            }
         });
+        
         if (questions.length === 0) { alert('Add at least one complete question with a correct answer.'); return; }
-        db.addExam({
-            title, programId,
-            duration: Number(document.getElementById('exDuration').value) || 20,
-            passMark: Number(document.getElementById('exPass').value) || 0,
-            negative: Number(document.getElementById('exNeg').value) || 0,
-            questions
-        });
-        document.getElementById('examModal').classList.add('hidden');
-        renderMCQ();
-        showMcqAlert('Exam created and assigned to the program’s registered students.', 'success');
-    };
 
-    window.deleteExam = function (id) {
-        if (!canAuthorExams) return;
-        if (confirm('Delete this exam?')) { db.deleteExam(id); renderMCQ(); }
-    };
+        const selectedCourses = Array.from(document.querySelectorAll('.ex-course-checkbox:checked')).map(cb => cb.value);
+        const selectedClasses = Array.from(document.querySelectorAll('.ex-class-checkbox:checked')).map(cb => cb.value);
 
-    function showMcqAlert(msg, type) {
-        const el = document.getElementById('mcqAlert');
-        if (!el) return;
-        el.textContent = msg; el.className = `alert alert-${type === 'success' ? 'success' : 'danger'} mb-3`;
-        setTimeout(() => el.classList.add('hidden'), 4000);
-    }
-
-    // External marks upload (Excel: RegNo + Score, for a chosen program)
-    window.openExternalMarks = function () {
-        if (!canAuthorExams) { alert('Permission denied.'); return; }
-        const progs = db.getTrainingPrograms();
-        const opts = progs.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
-        const html = `
-            <p class="text-muted small">Upload an Excel with columns <strong>Register Number</strong> and <strong>Score</strong>. Scores feed marks-based completion.</p>
-            <div class="form-group"><label class="form-label">Training Program</label><select id="emProgram" class="form-control">${opts}</select></div>
-            <div class="form-group"><label class="form-label">Excel File</label><input id="emFile" type="file" accept=".xlsx,.xls" class="form-control"></div>
-            <button class="btn btn-primary" onclick="processExternalMarks()">Upload Marks</button>`;
-        // Reuse class modal as a generic dialog
-        document.getElementById('classModalTitle').textContent = 'Upload External Marks';
-        document.getElementById('classModalBody').innerHTML = html;
-        document.getElementById('classModal').classList.remove('hidden');
-    };
-
-    window.processExternalMarks = function () {
-        const programId = document.getElementById('emProgram').value;
-        const file = document.getElementById('emFile').files[0];
-        if (!file) { alert('Choose a file.'); return; }
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-                const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-                let n = 0;
-                rows.forEach(r => {
-                    const reg = String(r['Register Number'] || r['Reg No'] || r['RegNo'] || '').trim();
-                    const score = r['Score'] != null ? Number(r['Score']) : null;
-                    if (reg && score != null && !isNaN(score)) { db.setStudentScore(reg, programId, score); n++; }
-                });
-                document.getElementById('classModal').classList.add('hidden');
-                alert(`Uploaded ${n} score(s).`);
-            } catch (err) { alert('Could not read file: ' + err.message); }
+        const target = {
+            type: (selectedCourses.length || selectedClasses.length) ? 'custom' : 'all',
+            courses: selectedCourses,
+            classes: selectedClasses
         };
-        reader.readAsArrayBuffer(file);
+
+        const examData = {
+            title,
+            duration: Number(document.getElementById('exDuration').value) || 0,
+            passMark: Number(document.getElementById('exPass').value) || 40,
+            negative: Number(document.getElementById('exNeg').value) || 0,
+            questions,
+            target
+        };
+
+        let result;
+        if (editingExamId) {
+            result = await db.updateExam(editingExamId, examData);
+            editingExamId = null;
+        } else {
+            result = await db.addExam(examData);
+        }
+
+        if (result.success) {
+            closeModal(document.getElementById('examModal'));
+            renderMCQ();
+        }
+    };
+
+    window.editExam = function (examId) {
+        if (!canAuthorExams) { alert('Permission denied.'); return; }
+        const exam = db.getExams().find(e => e.id === examId);
+        if (!exam) return;
+
+        editingExamId = examId;
+        document.getElementById('exTitle').value = exam.title;
+        document.getElementById('exDuration').value = exam.duration || 0;
+        document.getElementById('exPass').value = exam.passMark || 40;
+        document.getElementById('exNeg').value = exam.negative || 0;
+
+        // Populate Courses and Classes Checkboxes
+        const students = db.getStudents();
+        const courses = [...new Set(students.map(s => s.course).filter(Boolean))].sort();
+        const classes = [...new Set(students.map(s => s.class || s.className).filter(Boolean))].sort();
+
+        const target = exam.target || { type: 'all' };
+
+        const coursesDiv = document.getElementById('exCoursesContainer');
+        coursesDiv.innerHTML = courses.map(c => {
+            const checked = target.courses && target.courses.includes(c) ? 'checked' : '';
+            return `
+                <label style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem; font-weight:normal; font-size:0.875rem;">
+                    <input type="checkbox" class="ex-course-checkbox" value="${c}" ${checked}> ${c}
+                </label>
+            `;
+        }).join('') || '<span class="text-muted small">No courses available</span>';
+
+        const classesDiv = document.getElementById('exClassesContainer');
+        classesDiv.innerHTML = classes.map(cl => {
+            const checked = target.classes && target.classes.includes(cl) ? 'checked' : '';
+            return `
+                <label style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem; font-weight:normal; font-size:0.875rem;">
+                    <input type="checkbox" class="ex-class-checkbox" value="${cl}" ${checked}> ${cl}
+                </label>
+            `;
+        }).join('') || '<span class="text-muted small">No classes available</span>';
+
+        // Clear and rebuild questions
+        const wrap = document.getElementById('examQuestions');
+        wrap.innerHTML = '';
+
+        (exam.questions || []).forEach((q, idx) => {
+            const div = document.createElement('div');
+            div.className = 'glass-card mb-3';
+            div.dataset.q = idx;
+            div.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>Q${idx + 1}</strong>
+                    <button class="btn btn-danger btn-sm" onclick="this.closest('[data-q]').remove()">Remove</button>
+                </div>
+                <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:0.75rem;" class="mb-2">
+                    <input class="form-control q-text" placeholder="Question text" value="${(q.text || '').replace(/"/g, '&quot;')}">
+                    <select class="form-control q-type" onchange="onQTypeChange(this)">
+                        <option value="single" ${q.type === 'single' ? 'selected' : ''}>Single correct</option>
+                        <option value="multiple" ${q.type === 'multiple' ? 'selected' : ''}>Multiple correct</option>
+                        <option value="truefalse" ${q.type === 'truefalse' ? 'selected' : ''}>True / False</option>
+                    </select>
+                    <input class="form-control q-marks" type="number" value="${q.marks || 1}" min="0" step="0.5" title="Marks">
+                </div>
+                <div class="q-options"></div>
+                <div class="form-group mb-0 mt-2">
+                    <input class="form-control q-explanation" placeholder="Explanation (optional)" value="${(q.explanation || '').replace(/"/g, '&quot;')}">
+                </div>
+            `;
+            wrap.appendChild(div);
+            
+            // Render options
+            const box = div.querySelector('.q-options');
+            if (q.type === 'truefalse') {
+                const isTrue = q.correct && q.correct.includes('True');
+                box.innerHTML = `
+                    <label class="d-flex align-items-center gap-2 mb-1"><input type="radio" name="tf_${idx}" class="q-correct" value="True" ${isTrue ? 'checked' : ''}> True</label>
+                    <label class="d-flex align-items-center gap-2"><input type="radio" name="tf_${idx}" class="q-correct" value="False" ${!isTrue ? 'checked' : ''}> False</label>`;
+            } else {
+                const inputType = q.type === 'multiple' ? 'checkbox' : 'radio';
+                let html = '';
+                for (let oIdx = 0; oIdx < 4; oIdx++) {
+                    const optVal = q.options[oIdx] || '';
+                    const isChecked = q.correct && q.correct.includes(optVal) ? 'checked' : '';
+                    html += `<div class="d-flex align-items-center gap-2 mb-1">
+                        <input type="${inputType}" name="opt_${idx}" class="q-correct" value="${oIdx}" ${isChecked}>
+                        <input class="form-control q-opt" placeholder="Option ${oIdx + 1}" value="${optVal.replace(/"/g, '&quot;')}">
+                    </div>`;
+                }
+                box.innerHTML = html + '<small class="text-muted">Tick the correct option(s).</small>';
+            }
+        });
+
+        document.getElementById('examModalTitle').textContent = 'Edit MCQ Exam';
+        openModal(document.getElementById('examModal'));
+    };
+
+    window.deleteExam = async function (id) {
+        if (!canAuthorExams) return;
+        if (confirm('Delete this exam?')) {
+            const res = await db.deleteExam(id);
+            if (res.success) renderMCQ();
+        }
+    };
+
+    window.viewExamReport = function (examId) {
+        activeReportExamId = examId;
+        const exam = db.getExams().find(e => e.id === examId);
+        if (!exam) return;
+
+        document.getElementById('reportExamTitle').textContent = `Report: ${exam.title}`;
+        document.getElementById('examListPanel').classList.add('hidden');
+        document.getElementById('examReportPanel').classList.remove('hidden');
+
+        // Populate course filter
+        const students = db.getStudents();
+        const courses = [...new Set(students.map(s => s.course).filter(Boolean))].sort();
+        const courseFilter = document.getElementById('reportCourseFilter');
+        courseFilter.innerHTML = '<option value="">All Courses</option>' + 
+            courses.map(c => `<option value="${c}">${c}</option>`).join('');
+
+        filterExamReport();
+    };
+
+    window.closeExamReport = function () {
+        document.getElementById('examListPanel').classList.remove('hidden');
+        document.getElementById('examReportPanel').classList.add('hidden');
+        activeReportExamId = null;
+    };
+
+    window.filterExamReport = function () {
+        if (!activeReportExamId) return;
+        const exam = db.getExams().find(e => e.id === activeReportExamId);
+        if (!exam) return;
+
+        const students = db.getStudents();
+        const attempts = db.getExamAttempts().filter(a => a.exam_id === activeReportExamId);
+        
+        // Filter targeted students
+        const targetedStudents = students.filter(s => {
+            const t = exam.target || { type: 'all' };
+            if (!t || t.type === 'all') return true;
+            const matchesCourse = t.courses && t.courses.length > 0 && t.courses.includes(s.course);
+            const matchesClass = t.classes && t.classes.length > 0 && t.classes.includes(s.class);
+            if (t.courses && t.courses.length > 0 && t.classes && t.classes.length > 0) {
+                return matchesCourse || matchesClass;
+            } else if (t.courses && t.courses.length > 0) {
+                return matchesCourse;
+            } else if (t.classes && t.classes.length > 0) {
+                return matchesClass;
+            }
+            return true;
+        });
+
+        const courseVal = document.getElementById('reportCourseFilter').value;
+        const statusVal = document.getElementById('reportStatusFilter').value;
+        const searchVal = document.getElementById('reportSearchStudent').value.toLowerCase().trim();
+
+        const totalMarks = (exam.questions || []).reduce((a, q) => a + (Number(q.marks) || 0), 0);
+
+        const tbody = document.querySelector('#examReportTable tbody');
+        tbody.innerHTML = '';
+
+        const rows = targetedStudents.map(s => {
+            const attempt = attempts.find(a => a.register_number === s.registerNumber);
+            const done = attempt != null;
+            const score = done ? attempt.score : null;
+            const passed = done ? attempt.passed : false;
+            const dateStr = done ? new Date(attempt.submitted_at).toLocaleString() : '—';
+
+            let status = 'Not Attempted';
+            let statusClass = 'bg-secondary text-white';
+            if (done) {
+                status = passed ? 'Passed' : 'Failed';
+                statusClass = passed ? 'bg-success text-white' : 'bg-danger text-white';
+            }
+
+            // Filters
+            if (courseVal && s.course !== courseVal) return null;
+            if (searchVal && !s.name.toLowerCase().includes(searchVal) && !s.registerNumber.toLowerCase().includes(searchVal)) return null;
+            if (statusVal) {
+                if (statusVal === 'attempted' && !done) return null;
+                if (statusVal === 'not_attempted' && done) return null;
+                if (statusVal === 'passed' && (!done || !passed)) return null;
+                if (statusVal === 'failed' && (!done || passed)) return null;
+            }
+
+            return `<tr>
+                <td><strong>${s.name}</strong></td>
+                <td>${s.registerNumber}</td>
+                <td>${s.course || '—'}</td>
+                <td>${s.class || '—'}</td>
+                <td><span class="badge ${statusClass}" style="padding:4px 8px; border-radius:6px; font-weight:700;">${status}</span></td>
+                <td>${done ? `${score} / ${totalMarks}` : '—'}</td>
+                <td>${dateStr}</td>
+            </tr>`;
+        }).filter(Boolean).join('');
+
+        tbody.innerHTML = rows || '<tr><td colspan="7" class="text-center text-muted">No students found matching filters.</td></tr>';
     };
 
     // --- Initialization ---

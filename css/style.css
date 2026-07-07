@@ -55,6 +55,8 @@ body {
     background: #f9fafb;
     display: flex;
     flex-direction: column;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 /* Top Header */
@@ -1729,3 +1731,58 @@ select.form-control { cursor: pointer; }
     justify-content: flex-end;
     flex-shrink: 0;
 }
+
+/* Animations & Micro-interactions */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(12px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Page content active/transition */
+.tab-content {
+    animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Modal show transitions */
+.modal-content, #examModal .modal-content, #trainingModal .modal-content, #attendanceModal .modal-content {
+    animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Button & Card Micro-Interactions */
+.btn {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.glass-card, .sidebar-nav li a {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+}
+
+/* Modal Overlay crossfade */
+.modal-overlay, #examModal, #trainingModal, #attendanceModal {
+    transition: opacity 0.25s ease-out;
+}
+

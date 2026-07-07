@@ -267,11 +267,29 @@
         </div>
     </div>
 
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/db.js"></script>
     <script src="js/auth.js"></script>
     <script>
         checkAuth(['student', 'studentCoordinator']);
         
+        window.openModal = function(modal) {
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            modal.style.opacity = '0';
+            modal.offsetHeight; // Force reflow
+            modal.style.opacity = '1';
+        };
+
+        window.closeModal = function(modal) {
+            if (!modal) return;
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 250);
+        };
+
         document.addEventListener('DOMContentLoaded', async () => {
             await db.ready;
 
@@ -357,40 +375,54 @@
 
             // ---------- MCQ EXAMS (student) ----------
             function studentExams() {
-                const programs = db.getTrainingPrograms();
-                const myProgIds = programs.filter(p => (p.registrations || []).includes(user.registerNumber)).map(p => p.id);
-                return db.getExams().filter(e => myProgIds.includes(e.programId)).map(e => {
-                    const prog = programs.find(p => p.id === e.programId);
-                    return { ...e, programName: prog ? prog.name : '' };
-                });
-            }
+                const exams = db.getExams();
+                const attempts = db.getExamAttempts().filter(a => a.register_number === user.registerNumber);
+                return exams.filter(e => {
+                    const t = e.target || { type: 'all' };
+                    if (!t || t.type === 'all') return true;
+                    
+                    const studentCourse = (user.course || '').trim().toLowerCase();
+                    const studentClass = (user.class || '').trim().toLowerCase();
 
-            function examResult(programId) {
-                const s = db.getStudents().find(x => x.registerNumber === user.registerNumber);
-                let scores = {};
-                try { scores = (s && s.scores) ? (typeof s.scores === 'string' ? JSON.parse(s.scores) : s.scores) : {}; } catch (e) { scores = {}; }
-                return scores[programId];
+                    const matchesCourse = t.courses && t.courses.length > 0 && t.courses.map(x => x.trim().toLowerCase()).includes(studentCourse);
+                    const matchesClass = t.classes && t.classes.length > 0 && t.classes.map(x => x.trim().toLowerCase()).includes(studentClass);
+                    
+                    if (t.courses && t.courses.length > 0 && t.classes && t.classes.length > 0) {
+                        return matchesCourse || matchesClass;
+                    } else if (t.courses && t.courses.length > 0) {
+                        return matchesCourse;
+                    } else if (t.classes && t.classes.length > 0) {
+                        return matchesClass;
+                    }
+                    return true;
+                }).map(e => {
+                    const attempt = attempts.find(a => a.exam_id === e.id);
+                    return { ...e, attempt: attempt || null };
+                });
             }
 
             window.renderExams = function () {
                 const list = document.getElementById('examsList');
                 const exams = studentExams();
                 if (exams.length === 0) {
-                    list.innerHTML = '<div class="glass-card text-center py-5"><p class="text-muted">No exams assigned to your registered programs yet.</p></div>';
+                    list.innerHTML = '<div class="glass-card text-center py-5"><p class="text-muted">No exams assigned to your Course/Class yet.</p></div>';
                     return;
                 }
                 list.innerHTML = exams.map(e => {
                     const total = (e.questions || []).reduce((a, q) => a + (Number(q.marks) || 0), 0);
-                    const prev = examResult(e.programId);
-                    const done = prev != null;
+                    const done = e.attempt != null;
+                    const prevScore = done ? e.attempt.score : null;
                     return `<div class="glass-card mb-3">
                         <div class="d-flex justify-content-between align-items-center" style="flex-wrap:wrap;gap:0.5rem;">
                             <div>
                                 <h5 style="margin:0;">${e.title}</h5>
-                                <small class="text-muted">${e.programName} · ${(e.questions || []).length} questions · ${total} marks · ${e.duration} min</small>
+                                <small class="text-muted">${(e.questions || []).length} questions · ${total} marks · ${e.duration ? `${e.duration} min` : 'Untimed'}</small>
                             </div>
                             ${done
-                                ? `<span class="badge" style="background:${prev >= e.passMark ? '#ecfdf5' : '#fef2f2'};color:${prev >= e.passMark ? '#059669' : '#dc2626'};padding:6px 14px;border-radius:10px;">Score: ${prev} / ${total} · ${prev >= e.passMark ? 'Passed' : 'Failed'}</span>`
+                                ? `<div class="d-flex gap-2 align-items-center">
+                                     <span class="badge" style="background:${e.attempt.passed ? '#ecfdf5' : '#fef2f2'};color:${e.attempt.passed ? '#059669' : '#dc2626'};padding:6px 14px;border-radius:10px;">Score: ${prevScore} / ${total} · ${e.attempt.passed ? 'Passed' : 'Failed'}</span>
+                                     <button class="btn btn-secondary btn-sm" onclick="viewExplanations('${e.id}')">Review Answers</button>
+                                   </div>`
                                 : `<button class="btn btn-primary btn-sm" onclick="startExam('${e.id}')">Start Exam</button>`}
                         </div>
                     </div>`;
@@ -414,11 +446,14 @@
                 list.innerHTML = `
                     <div class="glass-card mb-3 d-flex justify-content-between align-items-center">
                         <h4 style="margin:0;">${exam.title}</h4>
-                        <span class="badge bg-primary" id="examTimer">${exam.duration}:00</span>
+                        <span class="badge bg-primary" id="examTimer">${exam.duration ? `${exam.duration}:00` : 'Untimed'}</span>
                     </div>
                     <form id="examForm">${qHtml}</form>
-                    <button class="btn btn-success" onclick="submitExam('${exam.id}')">Submit Exam</button>`;
-                startExamTimer(exam.duration, () => submitExam(exam.id));
+                    <button class="btn btn-success mt-3" onclick="submitExam('${exam.id}')">Submit Exam</button>`;
+                
+                if (exam.duration && exam.duration > 0) {
+                    startExamTimer(exam.duration, () => submitExam(exam.id));
+                }
             };
 
             let examTimerInt = null;
@@ -433,23 +468,97 @@
                 }, 1000);
             }
 
-            window.submitExam = function (examId) {
+            window.submitExam = async function (examId) {
                 const exam = db.getExams().find(e => e.id === examId);
                 if (!exam) return;
                 clearInterval(examTimerInt);
+                
                 let score = 0, totalMarks = 0;
+                const studentAnswers = {};
+                
                 (exam.questions || []).forEach((q, i) => {
                     totalMarks += Number(q.marks) || 0;
                     const picked = Array.from(document.querySelectorAll(`[name="q${i}"]:checked`)).map(x => x.value);
+                    studentAnswers[i] = picked;
+                    
                     const correct = q.correct || [];
                     const isRight = picked.length === correct.length && picked.every(v => correct.includes(v));
                     if (isRight) score += Number(q.marks) || 0;
                     else if (picked.length && exam.negative) score -= Number(exam.negative) || 0;
                 });
+                
                 if (score < 0) score = 0;
-                db.setStudentScore(user.registerNumber, exam.programId, score);
-                alert(`Exam submitted! Your score: ${score} / ${totalMarks} (${score >= exam.passMark ? 'Passed' : 'Failed'})`);
-                renderExams();
+                const passed = score >= ((exam.passMark / 100) * totalMarks);
+                
+                const attempt = {
+                    exam_id: exam.id,
+                    register_number: user.registerNumber,
+                    answers: studentAnswers,
+                    score: score,
+                    passed: passed
+                };
+                
+                const res = await db.addExamAttempt(attempt);
+                if (res.success) {
+                    alert(`Exam submitted! Your score: ${score} / ${totalMarks} (${passed ? 'Passed' : 'Failed'})`);
+                    showExamReview(exam, studentAnswers);
+                }
+            };
+
+            window.showExamReview = function (exam, studentAnswers) {
+                const list = document.getElementById('examsList');
+                let qHtml = (exam.questions || []).map((q, i) => {
+                    const picked = studentAnswers[i] || [];
+                    const correct = q.correct || [];
+                    const isRight = picked.length === correct.length && picked.every(v => correct.includes(v));
+                    
+                    let statusLabel = isRight 
+                        ? `<span class="badge" style="background:#ecfdf5; color:#059669; font-weight:700;">Correct</span>` 
+                        : `<span class="badge" style="background:#fef2f2; color:#dc2626; font-weight:700;">Incorrect</span>`;
+                    
+                    if (picked.length === 0) {
+                        statusLabel = `<span class="badge" style="background:#f1f5f9; color:#64748b; font-weight:700;">Not Attempted</span>`;
+                    }
+
+                    let explanationHtml = q.explanation 
+                        ? `<div style="background:#f8fafc; border-left:4px solid #3b82f6; padding:0.75rem; border-radius:4px; margin-top:0.75rem; font-size:0.875rem;">
+                             <strong>Explanation:</strong> ${q.explanation}
+                           </div>` 
+                        : '';
+
+                    return `
+                        <div class="glass-card mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong>Q${i + 1}. ${q.text}</strong>
+                                ${statusLabel}
+                            </div>
+                            <div style="font-size:0.875rem;">
+                                <div class="mb-1"><strong>Your Answer:</strong> ${picked.join(', ') || '<span class="text-muted">None</span>'}</div>
+                                <div class="mb-1"><strong>Correct Answer:</strong> ${correct.join(', ')}</div>
+                            </div>
+                            ${explanationHtml}
+                        </div>
+                    `;
+                }).join('');
+
+                list.innerHTML = `
+                    <div class="glass-card mb-3 d-flex justify-content-between align-items-center">
+                        <h4 style="margin:0;">Exam Review: ${exam.title}</h4>
+                        <button class="btn btn-secondary btn-sm" onclick="renderExams()">Back to Exams</button>
+                    </div>
+                    ${qHtml}
+                    <div class="text-center mt-4">
+                        <button class="btn btn-primary" onclick="renderExams()">Done</button>
+                    </div>
+                `;
+            };
+
+            window.viewExplanations = function (examId) {
+                const exam = db.getExams().find(e => e.id === examId);
+                const attempt = studentExams().find(e => e.id === examId)?.attempt;
+                if (exam && attempt) {
+                    showExamReview(exam, attempt.answers || {});
+                }
             };
 
 
