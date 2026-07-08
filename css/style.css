@@ -1668,7 +1668,7 @@ select.form-control { cursor: pointer; }
 }
 .premium-modal-header {
     background: linear-gradient(135deg, #0a0f1c 0%, #2563eb 100%);
-    padding: 1.75rem 2rem;
+    padding: 2.25rem 2rem 1.75rem 2rem;
     color: #ffffff;
     position: relative;
     flex-shrink: 0;
@@ -1680,6 +1680,7 @@ select.form-control { cursor: pointer; }
     color: #ffffff;
     font-weight: 800;
     font-size: 1.5rem;
+    line-height: 1.4;
     letter-spacing: -0.025em;
 }
 .premium-modal-header p {
@@ -1690,8 +1691,8 @@ select.form-control { cursor: pointer; }
 }
 .premium-modal-close-btn {
     position: absolute;
-    top: 1.25rem;
-    right: 1.25rem;
+    top: 1.75rem;
+    right: 1.75rem;
     background: rgba(255, 255, 255, 0.15);
     border: none;
     color: #ffffff;
