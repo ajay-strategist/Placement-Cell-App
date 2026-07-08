@@ -289,10 +289,10 @@
                 <!-- Student Modal (Pop-up) -->
                 <div id="studentModal" class="premium-modal-wrapper hidden">
                     <div class="premium-modal-card">
-                        <div class="premium-modal-header">
-                            <h2 id="studentModalTitle">Add New Student</h2>
+                        <div class="premium-modal-header" style="padding-top: 2.25rem !important; padding-bottom: 1.75rem !important;">
+                            <h2 id="studentModalTitle" style="margin-top: 0 !important; margin-bottom: 0.5rem !important; line-height: 1.4 !important; display: block !important;">Add New Student</h2>
                             <p id="studentModalSubtitle">Create a new student profile for placement tracking.</p>
-                            <button type="button" class="premium-modal-close-btn" id="closeStudentModalBtn">✕</button>
+                            <button type="button" class="premium-modal-close-btn" id="closeStudentModalBtn" style="top: 1.75rem !important; right: 1.75rem !important;">✕</button>
                         </div>
                         <form id="addStudentForm" class="premium-modal-form">
                             <div class="premium-modal-body">
@@ -333,9 +333,9 @@
                                             <option value="Other">Other</option>
                                         </select>
                                     </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">PASSWORD</label>
-                                        <input type="password" id="sPass" class="form-control" required placeholder="••••••••" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    <div class="form-group mb-0" style="grid-column: span 2;">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">PASSWORD (DEFAULTS TO 'password')</label>
+                                        <input type="password" id="sPass" class="form-control" placeholder="Leave empty for 'password'" style="background: #f9fafb; border-color: #e5e7eb;">
                                     </div>
                                 </div>
                                 <div class="admin-only-field mt-3 d-flex align-items-center gap-2" style="padding: 0.75rem 1rem; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;">
@@ -404,10 +404,10 @@
                 <!-- Teacher Modal (Pop-up) -->
                 <div id="teacherModal" class="premium-modal-wrapper hidden">
                     <div class="premium-modal-card" style="width: 600px;">
-                        <div class="premium-modal-header">
-                            <h2 id="teacherModalTitle">Add New Teacher</h2>
+                        <div class="premium-modal-header" style="padding-top: 2.25rem !important; padding-bottom: 1.75rem !important;">
+                            <h2 id="teacherModalTitle" style="margin-top: 0 !important; margin-bottom: 0.5rem !important; line-height: 1.4 !important; display: block !important;">Add New Teacher</h2>
                             <p id="teacherModalSubtitle">Set up a new instructor profile for the portal.</p>
-                            <button type="button" class="premium-modal-close-btn" id="closeTeacherModalBtn">✕</button>
+                            <button type="button" class="premium-modal-close-btn" id="closeTeacherModalBtn" style="top: 1.75rem !important; right: 1.75rem !important;">✕</button>
                         </div>
                         <form id="addTeacherForm" class="premium-modal-form">
                             <div class="premium-modal-body">
@@ -429,8 +429,8 @@
                                         <input type="text" id="tDept" class="form-control" required placeholder="e.g. Computer Science" style="background: #f9fafb; border-color: #e5e7eb;">
                                     </div>
                                     <div class="form-group mb-0" style="grid-column: span 2;">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">ACCESS PASSWORD</label>
-                                        <input type="password" id="tPass" class="form-control" required placeholder="••••••••" style="background: #f9fafb; border-color: #e5e7eb;">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">ACCESS PASSWORD (DEFAULTS TO 'password')</label>
+                                        <input type="password" id="tPass" class="form-control" placeholder="Leave empty for 'password'" style="background: #f9fafb; border-color: #e5e7eb;">
                                     </div>
                                 </div>
                                 <div class="admin-only-field mt-3 d-flex align-items-center gap-2" style="padding: 0.75rem 1rem; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;">
