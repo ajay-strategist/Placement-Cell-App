@@ -42,7 +42,7 @@ function toJSStudent(row) {
         department: row.department,
         class: row.class,
         gender: row.gender,
-        password: row.password,
+        password: row.password || 'password',
         isCoordinator: row.is_coordinator,
         forcePasswordReset: row.force_password_reset,
         scores: row.scores || {}
@@ -57,7 +57,8 @@ function toSQLTeacher(t) {
         email: t.mailId || t.email,
         department: t.department,
         password: t.password || 'password',
-        is_coordinator: t.isCoordinator === true || t.isCoordinator === 'true'
+        is_coordinator: t.isCoordinator === true || t.isCoordinator === 'true',
+        force_password_reset: t.forcePasswordReset === true || t.forcePasswordReset === 'true'
     };
 }
 
@@ -69,8 +70,9 @@ function toJSTeacher(row) {
         phoneNumber: row.phone,
         mailId: row.email,
         department: row.department,
-        password: row.password,
-        isCoordinator: row.is_coordinator
+        password: row.password || 'password',
+        isCoordinator: row.is_coordinator,
+        forcePasswordReset: row.force_password_reset
     };
 }
 
@@ -828,6 +830,7 @@ class Database {
             const index = this.cache.teachers.findIndex(t => t.phoneNumber === id);
             if (index !== -1) {
                 this.cache.teachers[index].password = newPassword;
+                delete this.cache.teachers[index].forcePasswordReset;
                 const res = await this.sync("Teacher", this.cache.teachers[index]);
                 if (res.success) showToast('Password updated!', 'success');
                 return { success: true, message: 'Password updated successfully.' };
@@ -1166,6 +1169,12 @@ class Database {
     }
 
     validateLogin(username, password, type) {
+        const checkPass = (user, inputPass) => {
+            const storedPass = user.password || 'password';
+            const isFirstLogin = user.forcePasswordReset === true || user.forcePasswordReset === 'true' || storedPass === 'password';
+            return storedPass === inputPass || (isFirstLogin && inputPass === 'password');
+        };
+
         if (type === 'admin') {
             const admin = this.cache.admin;
             if (username === admin.username && password === admin.password) {
@@ -1173,32 +1182,44 @@ class Database {
             }
             return { success: false, message: 'Invalid admin credentials.' };
         } else if (type === 'teacherCoordinator') {
-            const teacher = this.cache.teachers.find(t => t.phoneNumber === username && t.password === password);
+            const teacher = this.cache.teachers.find(t => t.phoneNumber === username);
             if (teacher) {
-                if (teacher.isCoordinator === true || teacher.isCoordinator === 'true') {
-                    return { success: true, user: teacher };
-                } else {
-                    return { success: false, message: 'You do not have Teacher Coordinator privileges.' };
+                if (checkPass(teacher, password)) {
+                    if (teacher.isCoordinator === true || teacher.isCoordinator === 'true') {
+                        return { success: true, user: teacher };
+                    } else {
+                        return { success: false, message: 'You do not have Teacher Coordinator privileges.' };
+                    }
                 }
             }
             return { success: false, message: 'Invalid teacher credentials.' };
         } else if (type === 'studentCoordinator') {
-            const student = this.cache.students.find(s => s.registerNumber === username && s.password === password);
+            const student = this.cache.students.find(s => s.registerNumber.trim().toLowerCase() === username.trim().toLowerCase());
             if (student) {
-                if (student.isCoordinator === true || student.isCoordinator === 'true') {
-                    return { success: true, user: student };
-                } else {
-                    return { success: false, message: 'You do not have Student Coordinator privileges.' };
+                if (checkPass(student, password)) {
+                    if (student.isCoordinator === true || student.isCoordinator === 'true') {
+                        return { success: true, user: student };
+                    } else {
+                        return { success: false, message: 'You do not have Student Coordinator privileges.' };
+                    }
                 }
             }
             return { success: false, message: 'Invalid register number or password.' };
         } else if (type === 'student') {
-            const student = this.cache.students.find(s => s.registerNumber === username && s.password === password);
-            if (student) return { success: true, user: student };
+            const student = this.cache.students.find(s => s.registerNumber.trim().toLowerCase() === username.trim().toLowerCase());
+            if (student) {
+                if (checkPass(student, password)) {
+                    return { success: true, user: student };
+                }
+            }
             return { success: false, message: 'Invalid register number or password.' };
         } else {
-            const teacher = this.cache.teachers.find(t => t.phoneNumber === username && t.password === password);
-            if (teacher) return { success: true, user: teacher };
+            const teacher = this.cache.teachers.find(t => t.phoneNumber === username);
+            if (teacher) {
+                if (checkPass(teacher, password)) {
+                    return { success: true, user: teacher };
+                }
+            }
             return { success: false, message: 'Invalid credentials.' };
         }
     }
