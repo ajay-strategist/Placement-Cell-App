@@ -295,70 +295,7 @@
                     </div>
                 </div>
 
-                <!-- Student Modal (Pop-up) -->
-                <div id="studentModal" class="premium-modal-wrapper hidden">
-                    <div class="premium-modal-card">
-                        <div class="premium-modal-header" style="padding-top: 2.25rem !important; padding-bottom: 1.75rem !important;">
-                            <h2 id="studentModalTitle" style="margin-top: 0 !important; margin-bottom: 0.5rem !important; line-height: 1.4 !important; display: block !important;">Add New Student</h2>
-                            <p id="studentModalSubtitle">Create a new student profile for placement tracking.</p>
-                            <button type="button" class="premium-modal-close-btn" id="closeStudentModalBtn" style="top: 1.75rem !important; right: 1.75rem !important;">✕</button>
-                        </div>
-                        <form id="addStudentForm" class="premium-modal-form">
-                            <div class="premium-modal-body">
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">FULL NAME</label>
-                                        <input type="text" id="sName" class="form-control" required placeholder="John Doe" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">REGISTER NUMBER</label>
-                                        <input type="text" id="sRegNo" class="form-control" required placeholder="CCBCA123" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">PHONE NUMBER</label>
-                                        <input type="text" id="sPhone" class="form-control" required placeholder="9876543210" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">EMAIL ADDRESS</label>
-                                        <input type="email" id="sMail" class="form-control" required placeholder="student@christcollege.edu" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">COURSE</label>
-                                        <input type="text" id="sCourse" class="form-control" required placeholder="e.g. BCA" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">DEPARTMENT</label>
-                                        <input type="text" id="sDept" class="form-control" required placeholder="e.g. Computer Science" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">CLASS / SECTION</label>
-                                        <input type="text" id="sClass" class="form-control" placeholder="e.g. 1 BCA A" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">GENDER</label>
-                                        <select id="sGender" class="form-control" required style="background: #f9fafb; border-color: #e5e7eb;">
-                                            <option value="Male">Male</option>
-                                            <option value="Female">Female</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group mb-0" style="grid-column: span 2;">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">PASSWORD (DEFAULTS TO 'password')</label>
-                                        <input type="password" id="sPass" class="form-control" placeholder="Leave empty for 'password'" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                </div>
-                                <div class="admin-only-field mt-3 d-flex align-items-center gap-2" style="padding: 0.75rem 1rem; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;">
-                                    <input type="checkbox" id="sIsCoordinator" style="width: 16px; height: 16px; cursor: pointer;">
-                                    <label for="sIsCoordinator" style="font-weight: 600; font-size: 0.85rem; color: #92400e; cursor: pointer; margin: 0;">⭐ Promote to Student Coordinator</label>
-                                </div>
-                            </div>
-                            <div class="premium-modal-footer">
-                                <button type="button" class="btn btn-secondary" id="cancelAddStudentBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
-                                <button type="submit" id="saveStudentBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Save Student Profile</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                
 
                 <!-- Bulk Upload Section (Hidden by default) -->
                 <div id="bulkUploadSection" class="mb-4 hidden" style="background: #f9fafb; padding: 1.5rem; border-radius: 8px; border: 1px dashed #d1d5db;">
@@ -408,50 +345,7 @@
 
                 <div id="teacherAlert" class="alert hidden mb-3"></div>
 
-                <!-- Teacher Modal (Pop-up) -->
-                <div id="teacherModal" class="premium-modal-wrapper hidden">
-                    <div class="premium-modal-card" style="width: 600px;">
-                        <div class="premium-modal-header" style="padding-top: 2.25rem !important; padding-bottom: 1.75rem !important;">
-                            <h2 id="teacherModalTitle" style="margin-top: 0 !important; margin-bottom: 0.5rem !important; line-height: 1.4 !important; display: block !important;">Add New Teacher</h2>
-                            <p id="teacherModalSubtitle">Set up a new instructor profile for the portal.</p>
-                            <button type="button" class="premium-modal-close-btn" id="closeTeacherModalBtn" style="top: 1.75rem !important; right: 1.75rem !important;">✕</button>
-                        </div>
-                        <form id="addTeacherForm" class="premium-modal-form">
-                            <div class="premium-modal-body">
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">FULL NAME</label>
-                                        <input type="text" id="tName" class="form-control" required placeholder="Dr. John Doe" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">PHONE NUMBER (USERNAME)</label>
-                                        <input type="text" id="tPhone" class="form-control" required placeholder="9876543210" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">EMAIL ADDRESS</label>
-                                        <input type="email" id="tMail" class="form-control" required placeholder="john.doe@college.edu" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">DEPARTMENT</label>
-                                        <input type="text" id="tDept" class="form-control" required placeholder="e.g. Computer Science" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0" style="grid-column: span 2;">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">ACCESS PASSWORD (DEFAULTS TO 'password')</label>
-                                        <input type="password" id="tPass" class="form-control" placeholder="Leave empty for 'password'" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                </div>
-                                <div class="admin-only-field mt-3 d-flex align-items-center gap-2" style="padding: 0.75rem 1rem; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;">
-                                    <input type="checkbox" id="tIsCoordinator" style="width: 16px; height: 16px; cursor: pointer;">
-                                    <label for="tIsCoordinator" style="font-weight: 600; font-size: 0.85rem; color: #92400e; cursor: pointer; margin: 0;">⭐ Promote to Teacher Coordinator</label>
-                                </div>
-                            </div>
-                            <div class="premium-modal-footer">
-                                <button type="button" class="btn btn-secondary" id="cancelAddTeacherBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
-                                <button type="submit" id="saveTeacherBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Save Teacher Profile</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                
 
                 <!-- Teacher Filters Section -->
                 <div class="mb-4 d-flex gap-3 align-items-center">
@@ -504,87 +398,7 @@
 
                 <div id="trainingAlert" class="alert hidden mb-3"></div>
 
-                <!-- Training Modal (Pop-up) -->
-                <div id="trainingModal" class="premium-modal-wrapper hidden">
-                    <div class="premium-modal-card">
-                        <div class="premium-modal-header" style="padding-top: 2.25rem !important; padding-bottom: 1.75rem !important;">
-                            <h2 id="trainingModalTitle" style="margin-top: 0 !important; margin-bottom: 0.5rem !important; line-height: 1.4 !important; display: block !important;">Create New Training Program</h2>
-                            <p id="trainingModalSubtitle">Schedule and manage a new training activity.</p>
-                            <button type="button" class="premium-modal-close-btn" id="closeTrainingModalBtn" style="top: 1.75rem !important; right: 1.75rem !important;">✕</button>
-                        </div>
-                        <form id="addTrainingForm" class="premium-modal-form">
-                            <div class="premium-modal-body">
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">PROGRAM NAME</label>
-                                        <input type="text" id="trnName" class="form-control" required placeholder="e.g. Soft Skills Workshop" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">VENUE</label>
-                                        <input type="text" id="trnVenue" class="form-control" required placeholder="e.g. Main Auditorium" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">START DATE</label>
-                                        <input type="date" id="trnDate" class="form-control" required style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">END DATE</label>
-                                        <input type="date" id="trnEndDate" class="form-control" required style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">NUMBER OF DAYS</label>
-                                        <input type="number" id="trnDays" class="form-control" readonly style="background: #f3f4f6; cursor: not-allowed; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0" style="grid-column: span 2;">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <label class="form-label mb-0" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">DESCRIPTION</label>
-                                            <div class="formatting-toolbar d-flex gap-1">
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'b')" title="Bold" style="padding: 2px 8px; font-size: 10px; font-weight: 800; border: 1px solid #e5e7eb;">B</button>
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'i')" title="Italic" style="padding: 2px 8px; font-size: 10px; font-style: italic; border: 1px solid #e5e7eb;">I</button>
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'lg')" title="Large" style="padding: 2px 8px; font-size: 10px; border: 1px solid #e5e7eb;">A+</button>
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'sm')" title="Small" style="padding: 2px 8px; font-size: 10px; border: 1px solid #e5e7eb;">a-</button>
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'red')" title="Red" style="padding: 2px 8px; font-size: 10px; color: #dc2626; border: 1px solid #e5e7eb;">Red</button>
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'green')" title="Green" style="padding: 2px 8px; font-size: 10px; color: #16a34a; border: 1px solid #e5e7eb;">Grn</button>
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'blue')" title="Blue" style="padding: 2px 8px; font-size: 10px; color: #2563eb; border: 1px solid #e5e7eb;">Blu</button>
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'list')" title="Bullet List" style="padding: 2px 8px; font-size: 10px; border: 1px solid #e5e7eb;">• List</button>
-                                            </div>
-                                        </div>
-                                        <div id="trnDesc" contenteditable="true" class="form-control" style="background: #f9fafb; border-color: #e5e7eb; min-height: 100px; overflow-y: auto; cursor: text; padding: 0.75rem;"></div>
-                                        <small class="text-muted" style="font-size: 10px;">Use the buttons above to format your text. The view above shows the final appearance.</small>
-                                    </div>
-                                    <div class="form-group mb-0" style="grid-column: span 2;">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">TARGET AUDIENCE</label>
-                                        <div class="d-flex gap-3 align-items-center mb-2 mt-1">
-                                            <label style="cursor: pointer;"><input type="radio" name="targetType" value="all" checked class="mr-1"> All Students</label>
-                                            <label style="cursor: pointer;"><input type="radio" name="targetType" value="course" class="mr-1"> Specific Courses</label>
-                                            <label style="cursor: pointer;"><input type="radio" name="targetType" value="dept" class="mr-1"> Specific Departments</label>
-                                        </div>
-                                        
-                                        <!-- Courses Multi-select -->
-                                        <div id="courseFilterSection" class="hidden mt-2">
-                                            <label class="form-label small" style="color: var(--primary-color);">Select Courses</label>
-                                            <div id="trnCourseList" class="form-control" style="height: 120px; overflow-y: auto; background: #fff; padding: 0.75rem; border-color: #e5e7eb;">
-                                                <!-- Courses checkboxes injected here -->
-                                            </div>
-                                        </div>
-        
-                                        <!-- Departments Multi-select -->
-                                        <div id="deptFilterSection" class="hidden mt-2">
-                                            <label class="form-label small" style="color: var(--primary-color);">Select Departments</label>
-                                            <div id="trnDeptList" class="form-control" style="height: 120px; overflow-y: auto; background: #fff; padding: 0.75rem; border-color: #e5e7eb;">
-                                                <!-- Departments checkboxes injected here -->
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="premium-modal-footer">
-                                <button type="button" class="btn btn-secondary" id="cancelAddTrainingBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
-                                <button type="submit" id="saveTrainingBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Create Program</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                
 
                 <!-- Training Programs Table -->
                 <div class="table-responsive">
@@ -969,77 +783,7 @@
                     </div>
                 </div>
 
-                <!-- Placement Modal (Pop-up) -->
-                <div id="placementModal" class="premium-modal-wrapper hidden">
-                    <div class="premium-modal-card">
-                        <div class="premium-modal-header" style="padding-top: 2.25rem !important; padding-bottom: 1.75rem !important;">
-                            <h2 id="placementModalTitle" style="margin-top: 0 !important; margin-bottom: 0.5rem !important; line-height: 1.4 !important; display: block !important;">Create Placement Activity</h2>
-                            <p id="placementModalSubtitle">Drive recruitment activities and track selection phases.</p>
-                            <button type="button" class="premium-modal-close-btn" id="closePlacementModalBtn" style="top: 1.75rem !important; right: 1.75rem !important;">✕</button>
-                        </div>
-                        <form id="addPlacementForm" class="premium-modal-form">
-                            <div class="premium-modal-body">
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">ACTIVITY NAME</label>
-                                        <input type="text" id="pName" class="form-control" required placeholder="e.g. Google Recruitment Drive 2026" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">VENUE / MODE</label>
-                                        <input type="text" id="pVenue" class="form-control" required placeholder="e.g. Virtual or Main Hall" style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">START DATE</label>
-                                        <input type="date" id="pDate" class="form-control" required style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">LAST DATE TO APPLY</label>
-                                        <input type="date" id="pLastDate" class="form-control" required style="background: #f9fafb; border-color: #e5e7eb;">
-                                    </div>
-                                    <div class="form-group mb-0" style="grid-column: span 2;">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <label class="form-label mb-0" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">DESCRIPTION</label>
-                                            <div class="formatting-toolbar d-flex gap-1">
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'b')" title="Bold" style="padding: 2px 8px; font-size: 10px; font-weight: 800; border: 1px solid #e5e7eb;">B</button>
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'i')" title="Italic" style="padding: 2px 8px; font-size: 10px; font-style: italic; border: 1px solid #e5e7eb;">I</button>
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'lg')" title="Large" style="padding: 2px 8px; font-size: 10px; border: 1px solid #e5e7eb;">A+</button>
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'sm')" title="Small" style="padding: 2px 8px; font-size: 10px; border: 1px solid #e5e7eb;">a-</button>
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'red')" title="Red" style="padding: 2px 8px; font-size: 10px; color: #dc2626; border: 1px solid #e5e7eb;">Red</button>
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'green')" title="Green" style="padding: 2px 8px; font-size: 10px; color: #16a34a; border: 1px solid #e5e7eb;">Grn</button>
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'blue')" title="Blue" style="padding: 2px 8px; font-size: 10px; color: #2563eb; border: 1px solid #e5e7eb;">Blu</button>
-                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'list')" title="Bullet List" style="padding: 2px 8px; font-size: 10px; border: 1px solid #e5e7eb;">• List</button>
-                                            </div>
-                                        </div>
-                                        <div id="pDesc" contenteditable="true" class="form-control" style="background: #f9fafb; border-color: #e5e7eb; min-height: 120px; overflow-y: auto; cursor: text; padding: 0.75rem;"></div>
-                                        <small class="text-muted" style="font-size: 10px;">Use the buttons above to format your text. The view above shows the final appearance.</small>
-                                    </div>
-                                    <div class="form-group mb-0" style="grid-column: span 2;">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">TARGET AUDIENCE</label>
-                                        <div class="d-flex gap-3 align-items-center mb-2 mt-1">
-                                            <label style="cursor: pointer;"><input type="radio" name="pTargetType" value="all" checked class="mr-1"> All Students</label>
-                                            <label style="cursor: pointer;"><input type="radio" name="pTargetType" value="course" class="mr-1"> Specific Courses</label>
-                                            <label style="cursor: pointer;"><input type="radio" name="pTargetType" value="dept" class="mr-1"> Specific Departments</label>
-                                            <label style="cursor: pointer;"><input type="radio" name="pTargetType" value="student" class="mr-1"> Specific Students</label>
-                                        </div>
-                                        <div id="pCourseListSection" class="hidden mt-2">
-                                            <div id="pCourseList" class="form-control" style="height: 120px; overflow-y: auto; background: #fff; border-color: #e5e7eb;"></div>
-                                        </div>
-                                        <div id="pDeptListSection" class="hidden mt-2">
-                                            <div id="pDeptList" class="form-control" style="height: 120px; overflow-y: auto; background: #fff; border-color: #e5e7eb;"></div>
-                                        </div>
-                                        <div id="pStudentListSection" class="hidden mt-2">
-                                            <div id="pStudentList" class="form-control" style="height: 150px; overflow-y: auto; background: #fff; border-color: #e5e7eb;"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="premium-modal-footer">
-                                <button type="button" class="btn btn-secondary" id="cancelAddPlacementBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
-                                <button type="submit" id="savePlacementBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Create Activity</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                
                     </div>
                 </div>
 
@@ -1152,7 +896,273 @@
             if (type === 'blue') document.execCommand('foreColor', false, '#2563eb');
         }
     </script>
-    <!-- Force Password Reset Modal -->
+    
+
+<!-- Student Modal (Pop-up) -->
+                <div id="studentModal" class="premium-modal-wrapper hidden">
+                    <div class="premium-modal-card">
+                        <div class="premium-modal-header" style="padding-top: 2.25rem !important; padding-bottom: 1.75rem !important;">
+                            <h2 id="studentModalTitle" style="margin-top: 0 !important; margin-bottom: 0.5rem !important; line-height: 1.4 !important; display: block !important;">Add New Student</h2>
+                            <p id="studentModalSubtitle">Create a new student profile for placement tracking.</p>
+                            <button type="button" class="premium-modal-close-btn" id="closeStudentModalBtn" style="top: 1.75rem !important; right: 1.75rem !important;">✕</button>
+                        </div>
+                        <form id="addStudentForm" class="premium-modal-form">
+                            <div class="premium-modal-body">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">FULL NAME</label>
+                                        <input type="text" id="sName" class="form-control" required placeholder="John Doe" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">REGISTER NUMBER</label>
+                                        <input type="text" id="sRegNo" class="form-control" required placeholder="CCBCA123" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">PHONE NUMBER</label>
+                                        <input type="text" id="sPhone" class="form-control" required placeholder="9876543210" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">EMAIL ADDRESS</label>
+                                        <input type="email" id="sMail" class="form-control" required placeholder="student@christcollege.edu" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">COURSE</label>
+                                        <input type="text" id="sCourse" class="form-control" required placeholder="e.g. BCA" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">DEPARTMENT</label>
+                                        <input type="text" id="sDept" class="form-control" required placeholder="e.g. Computer Science" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">CLASS / SECTION</label>
+                                        <input type="text" id="sClass" class="form-control" placeholder="e.g. 1 BCA A" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">GENDER</label>
+                                        <select id="sGender" class="form-control" required style="background: #f9fafb; border-color: #e5e7eb;">
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group mb-0" style="grid-column: span 2;">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">PASSWORD (DEFAULTS TO 'password')</label>
+                                        <input type="password" id="sPass" class="form-control" placeholder="Leave empty for 'password'" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                </div>
+                                <div class="admin-only-field mt-3 d-flex align-items-center gap-2" style="padding: 0.75rem 1rem; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;">
+                                    <input type="checkbox" id="sIsCoordinator" style="width: 16px; height: 16px; cursor: pointer;">
+                                    <label for="sIsCoordinator" style="font-weight: 600; font-size: 0.85rem; color: #92400e; cursor: pointer; margin: 0;">⭐ Promote to Student Coordinator</label>
+                                </div>
+                            </div>
+                            <div class="premium-modal-footer">
+                                <button type="button" class="btn btn-secondary" id="cancelAddStudentBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
+                                <button type="submit" id="saveStudentBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Save Student Profile</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+<!-- Teacher Modal (Pop-up) -->
+                <div id="teacherModal" class="premium-modal-wrapper hidden">
+                    <div class="premium-modal-card" style="width: 600px;">
+                        <div class="premium-modal-header" style="padding-top: 2.25rem !important; padding-bottom: 1.75rem !important;">
+                            <h2 id="teacherModalTitle" style="margin-top: 0 !important; margin-bottom: 0.5rem !important; line-height: 1.4 !important; display: block !important;">Add New Teacher</h2>
+                            <p id="teacherModalSubtitle">Set up a new instructor profile for the portal.</p>
+                            <button type="button" class="premium-modal-close-btn" id="closeTeacherModalBtn" style="top: 1.75rem !important; right: 1.75rem !important;">✕</button>
+                        </div>
+                        <form id="addTeacherForm" class="premium-modal-form">
+                            <div class="premium-modal-body">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">FULL NAME</label>
+                                        <input type="text" id="tName" class="form-control" required placeholder="Dr. John Doe" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">PHONE NUMBER (USERNAME)</label>
+                                        <input type="text" id="tPhone" class="form-control" required placeholder="9876543210" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">EMAIL ADDRESS</label>
+                                        <input type="email" id="tMail" class="form-control" required placeholder="john.doe@college.edu" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">DEPARTMENT</label>
+                                        <input type="text" id="tDept" class="form-control" required placeholder="e.g. Computer Science" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0" style="grid-column: span 2;">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">ACCESS PASSWORD (DEFAULTS TO 'password')</label>
+                                        <input type="password" id="tPass" class="form-control" placeholder="Leave empty for 'password'" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                </div>
+                                <div class="admin-only-field mt-3 d-flex align-items-center gap-2" style="padding: 0.75rem 1rem; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;">
+                                    <input type="checkbox" id="tIsCoordinator" style="width: 16px; height: 16px; cursor: pointer;">
+                                    <label for="tIsCoordinator" style="font-weight: 600; font-size: 0.85rem; color: #92400e; cursor: pointer; margin: 0;">⭐ Promote to Teacher Coordinator</label>
+                                </div>
+                            </div>
+                            <div class="premium-modal-footer">
+                                <button type="button" class="btn btn-secondary" id="cancelAddTeacherBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
+                                <button type="submit" id="saveTeacherBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Save Teacher Profile</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+<!-- Training Modal (Pop-up) -->
+                <div id="trainingModal" class="premium-modal-wrapper hidden">
+                    <div class="premium-modal-card">
+                        <div class="premium-modal-header" style="padding-top: 2.25rem !important; padding-bottom: 1.75rem !important;">
+                            <h2 id="trainingModalTitle" style="margin-top: 0 !important; margin-bottom: 0.5rem !important; line-height: 1.4 !important; display: block !important;">Create New Training Program</h2>
+                            <p id="trainingModalSubtitle">Schedule and manage a new training activity.</p>
+                            <button type="button" class="premium-modal-close-btn" id="closeTrainingModalBtn" style="top: 1.75rem !important; right: 1.75rem !important;">✕</button>
+                        </div>
+                        <form id="addTrainingForm" class="premium-modal-form">
+                            <div class="premium-modal-body">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">PROGRAM NAME</label>
+                                        <input type="text" id="trnName" class="form-control" required placeholder="e.g. Soft Skills Workshop" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">VENUE</label>
+                                        <input type="text" id="trnVenue" class="form-control" required placeholder="e.g. Main Auditorium" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">START DATE</label>
+                                        <input type="date" id="trnDate" class="form-control" required style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">END DATE</label>
+                                        <input type="date" id="trnEndDate" class="form-control" required style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">NUMBER OF DAYS</label>
+                                        <input type="number" id="trnDays" class="form-control" readonly style="background: #f3f4f6; cursor: not-allowed; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0" style="grid-column: span 2;">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label class="form-label mb-0" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">DESCRIPTION</label>
+                                            <div class="formatting-toolbar d-flex gap-1">
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'b')" title="Bold" style="padding: 2px 8px; font-size: 10px; font-weight: 800; border: 1px solid #e5e7eb;">B</button>
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'i')" title="Italic" style="padding: 2px 8px; font-size: 10px; font-style: italic; border: 1px solid #e5e7eb;">I</button>
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'lg')" title="Large" style="padding: 2px 8px; font-size: 10px; border: 1px solid #e5e7eb;">A+</button>
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'sm')" title="Small" style="padding: 2px 8px; font-size: 10px; border: 1px solid #e5e7eb;">a-</button>
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'red')" title="Red" style="padding: 2px 8px; font-size: 10px; color: #dc2626; border: 1px solid #e5e7eb;">Red</button>
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'green')" title="Green" style="padding: 2px 8px; font-size: 10px; color: #16a34a; border: 1px solid #e5e7eb;">Grn</button>
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'blue')" title="Blue" style="padding: 2px 8px; font-size: 10px; color: #2563eb; border: 1px solid #e5e7eb;">Blu</button>
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('trnDesc', 'list')" title="Bullet List" style="padding: 2px 8px; font-size: 10px; border: 1px solid #e5e7eb;">• List</button>
+                                            </div>
+                                        </div>
+                                        <div id="trnDesc" contenteditable="true" class="form-control" style="background: #f9fafb; border-color: #e5e7eb; min-height: 100px; overflow-y: auto; cursor: text; padding: 0.75rem;"></div>
+                                        <small class="text-muted" style="font-size: 10px;">Use the buttons above to format your text. The view above shows the final appearance.</small>
+                                    </div>
+                                    <div class="form-group mb-0" style="grid-column: span 2;">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">TARGET AUDIENCE</label>
+                                        <div class="d-flex gap-3 align-items-center mb-2 mt-1">
+                                            <label style="cursor: pointer;"><input type="radio" name="targetType" value="all" checked class="mr-1"> All Students</label>
+                                            <label style="cursor: pointer;"><input type="radio" name="targetType" value="course" class="mr-1"> Specific Courses</label>
+                                            <label style="cursor: pointer;"><input type="radio" name="targetType" value="dept" class="mr-1"> Specific Departments</label>
+                                        </div>
+                                        
+                                        <!-- Courses Multi-select -->
+                                        <div id="courseFilterSection" class="hidden mt-2">
+                                            <label class="form-label small" style="color: var(--primary-color);">Select Courses</label>
+                                            <div id="trnCourseList" class="form-control" style="height: 120px; overflow-y: auto; background: #fff; padding: 0.75rem; border-color: #e5e7eb;">
+                                                <!-- Courses checkboxes injected here -->
+                                            </div>
+                                        </div>
+        
+                                        <!-- Departments Multi-select -->
+                                        <div id="deptFilterSection" class="hidden mt-2">
+                                            <label class="form-label small" style="color: var(--primary-color);">Select Departments</label>
+                                            <div id="trnDeptList" class="form-control" style="height: 120px; overflow-y: auto; background: #fff; padding: 0.75rem; border-color: #e5e7eb;">
+                                                <!-- Departments checkboxes injected here -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="premium-modal-footer">
+                                <button type="button" class="btn btn-secondary" id="cancelAddTrainingBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
+                                <button type="submit" id="saveTrainingBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Create Program</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+<!-- Placement Modal (Pop-up) -->
+                <div id="placementModal" class="premium-modal-wrapper hidden">
+                    <div class="premium-modal-card">
+                        <div class="premium-modal-header" style="padding-top: 2.25rem !important; padding-bottom: 1.75rem !important;">
+                            <h2 id="placementModalTitle" style="margin-top: 0 !important; margin-bottom: 0.5rem !important; line-height: 1.4 !important; display: block !important;">Create Placement Activity</h2>
+                            <p id="placementModalSubtitle">Drive recruitment activities and track selection phases.</p>
+                            <button type="button" class="premium-modal-close-btn" id="closePlacementModalBtn" style="top: 1.75rem !important; right: 1.75rem !important;">✕</button>
+                        </div>
+                        <form id="addPlacementForm" class="premium-modal-form">
+                            <div class="premium-modal-body">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">ACTIVITY NAME</label>
+                                        <input type="text" id="pName" class="form-control" required placeholder="e.g. Google Recruitment Drive 2026" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">VENUE / MODE</label>
+                                        <input type="text" id="pVenue" class="form-control" required placeholder="e.g. Virtual or Main Hall" style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">START DATE</label>
+                                        <input type="date" id="pDate" class="form-control" required style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">LAST DATE TO APPLY</label>
+                                        <input type="date" id="pLastDate" class="form-control" required style="background: #f9fafb; border-color: #e5e7eb;">
+                                    </div>
+                                    <div class="form-group mb-0" style="grid-column: span 2;">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label class="form-label mb-0" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">DESCRIPTION</label>
+                                            <div class="formatting-toolbar d-flex gap-1">
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'b')" title="Bold" style="padding: 2px 8px; font-size: 10px; font-weight: 800; border: 1px solid #e5e7eb;">B</button>
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'i')" title="Italic" style="padding: 2px 8px; font-size: 10px; font-style: italic; border: 1px solid #e5e7eb;">I</button>
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'lg')" title="Large" style="padding: 2px 8px; font-size: 10px; border: 1px solid #e5e7eb;">A+</button>
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'sm')" title="Small" style="padding: 2px 8px; font-size: 10px; border: 1px solid #e5e7eb;">a-</button>
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'red')" title="Red" style="padding: 2px 8px; font-size: 10px; color: #dc2626; border: 1px solid #e5e7eb;">Red</button>
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'green')" title="Green" style="padding: 2px 8px; font-size: 10px; color: #16a34a; border: 1px solid #e5e7eb;">Grn</button>
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'blue')" title="Blue" style="padding: 2px 8px; font-size: 10px; color: #2563eb; border: 1px solid #e5e7eb;">Blu</button>
+                                                <button type="button" class="btn btn-light btn-xs" onclick="insertFormat('pDesc', 'list')" title="Bullet List" style="padding: 2px 8px; font-size: 10px; border: 1px solid #e5e7eb;">• List</button>
+                                            </div>
+                                        </div>
+                                        <div id="pDesc" contenteditable="true" class="form-control" style="background: #f9fafb; border-color: #e5e7eb; min-height: 120px; overflow-y: auto; cursor: text; padding: 0.75rem;"></div>
+                                        <small class="text-muted" style="font-size: 10px;">Use the buttons above to format your text. The view above shows the final appearance.</small>
+                                    </div>
+                                    <div class="form-group mb-0" style="grid-column: span 2;">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">TARGET AUDIENCE</label>
+                                        <div class="d-flex gap-3 align-items-center mb-2 mt-1">
+                                            <label style="cursor: pointer;"><input type="radio" name="pTargetType" value="all" checked class="mr-1"> All Students</label>
+                                            <label style="cursor: pointer;"><input type="radio" name="pTargetType" value="course" class="mr-1"> Specific Courses</label>
+                                            <label style="cursor: pointer;"><input type="radio" name="pTargetType" value="dept" class="mr-1"> Specific Departments</label>
+                                            <label style="cursor: pointer;"><input type="radio" name="pTargetType" value="student" class="mr-1"> Specific Students</label>
+                                        </div>
+                                        <div id="pCourseListSection" class="hidden mt-2">
+                                            <div id="pCourseList" class="form-control" style="height: 120px; overflow-y: auto; background: #fff; border-color: #e5e7eb;"></div>
+                                        </div>
+                                        <div id="pDeptListSection" class="hidden mt-2">
+                                            <div id="pDeptList" class="form-control" style="height: 120px; overflow-y: auto; background: #fff; border-color: #e5e7eb;"></div>
+                                        </div>
+                                        <div id="pStudentListSection" class="hidden mt-2">
+                                            <div id="pStudentList" class="form-control" style="height: 150px; overflow-y: auto; background: #fff; border-color: #e5e7eb;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="premium-modal-footer">
+                                <button type="button" class="btn btn-secondary" id="cancelAddPlacementBtn" style="padding: 0.75rem 2rem; border-radius: 10px; font-weight: 600;">Discard</button>
+                                <button type="submit" id="savePlacementBtn" class="btn btn-primary" style="padding: 0.75rem 2.5rem; border-radius: 10px; font-weight: 600; background: #0D6EFC; box-shadow: 0 10px 15px -3px rgba(13, 110, 252, 0.3);">Create Activity</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+<!-- Force Password Reset Modal -->
     <div id="resetPassModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(8px);">
         <div class="glass-card" style="width: 400px; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
             <h3 class="mb-2" style="color: #1e3a8a; font-weight: 700;">Security Update</h3>
