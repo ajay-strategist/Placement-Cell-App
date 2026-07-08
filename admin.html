@@ -343,8 +343,8 @@
                                         </select>
                                     </div>
                                     <div class="form-group mb-0">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">PASSWORD</label>
-                                        <input type="password" id="sPass" class="form-control" required placeholder="••••••••" style="background: #f9fafb; border-color: #e5e7eb;">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">PASSWORD (DEFAULTS TO 'password')</label>
+                                        <input type="password" id="sPass" class="form-control" placeholder="Leave empty for 'password'" style="background: #f9fafb; border-color: #e5e7eb;">
                                     </div>
                                 </div>
                                 <div class="admin-only-field mt-3 d-flex align-items-center gap-2" style="padding: 0.75rem 1rem; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;">
@@ -436,8 +436,8 @@
                                         <input type="text" id="tDept" class="form-control" required placeholder="e.g. Computer Science" style="background: #f9fafb; border-color: #e5e7eb;">
                                     </div>
                                     <div class="form-group mb-0" style="grid-column: span 2;">
-                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">ACCESS PASSWORD</label>
-                                        <input type="password" id="tPass" class="form-control" required placeholder="••••••••" style="background: #f9fafb; border-color: #e5e7eb;">
+                                        <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">ACCESS PASSWORD (DEFAULTS TO 'password')</label>
+                                        <input type="password" id="tPass" class="form-control" placeholder="Leave empty for 'password'" style="background: #f9fafb; border-color: #e5e7eb;">
                                     </div>
                                 </div>
                                 <div class="admin-only-field mt-3 d-flex align-items-center gap-2" style="padding: 0.75rem 1rem; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;">
@@ -1152,6 +1152,23 @@
             if (type === 'blue') document.execCommand('foreColor', false, '#2563eb');
         }
     </script>
+    <!-- Force Password Reset Modal -->
+    <div id="resetPassModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(8px);">
+        <div class="glass-card" style="width: 400px; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            <h3 class="mb-2" style="color: #1e3a8a; font-weight: 700;">Security Update</h3>
+            <p class="text-muted small mb-4">Please set a new password for your account to continue.</p>
+            <div class="form-group">
+                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">NEW PASSWORD</label>
+                <input type="password" id="newPass" class="form-control" placeholder="Enter new password" style="background: #f9fafb; border-color: #e5e7eb;">
+            </div>
+            <div class="form-group mt-3">
+                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">CONFIRM PASSWORD</label>
+                <input type="password" id="confirmPass" class="form-control" placeholder="Confirm new password" style="background: #f9fafb; border-color: #e5e7eb;">
+            </div>
+            <button class="btn btn-primary w-100 mt-4" id="saveNewPassBtn" style="padding: 0.75rem; border-radius: 8px; font-weight: 600;">Update Password</button>
+        </div>
+    </div>
+
     <script src="js/admin.js"></script>
 </body>
 </html>

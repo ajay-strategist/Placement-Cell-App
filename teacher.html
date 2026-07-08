@@ -14,7 +14,9 @@
 <body class="premium-ui">
     <div class="app-container">
         <aside class="sidebar">
-            <div class="college-logo-placeholder" style="margin-bottom: 1rem;">CC</div>
+            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                <img src="LogoIcon.png" alt="College Logo" style="width: 100%; max-width: 80px; height: auto; object-fit: contain;">
+            </div>
             <a href="#" class="sidebar-brand">Teacher Portal</a>
             <ul class="sidebar-nav">
                 <li>
@@ -265,6 +267,23 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Force Password Reset Modal -->
+    <div id="resetPassModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(8px);">
+        <div class="glass-card" style="width: 400px; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+            <h3 class="mb-2" style="color: #1e3a8a; font-weight: 700;">Security Update</h3>
+            <p class="text-muted small mb-4">Please set a new password for your account to continue.</p>
+            <div class="form-group">
+                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">NEW PASSWORD</label>
+                <input type="password" id="newPass" class="form-control" placeholder="Enter new password" style="background: #f9fafb; border-color: #e5e7eb;">
+            </div>
+            <div class="form-group mt-3">
+                <label class="form-label" style="font-weight: 600; font-size: 0.85rem; color: #4b5563;">CONFIRM PASSWORD</label>
+                <input type="password" id="confirmPass" class="form-control" placeholder="Confirm new password" style="background: #f9fafb; border-color: #e5e7eb;">
+            </div>
+            <button class="btn btn-primary w-100 mt-4" id="saveNewPassBtn" style="padding: 0.75rem; border-radius: 8px; font-weight: 600;">Update Password</button>
         </div>
     </div>
 

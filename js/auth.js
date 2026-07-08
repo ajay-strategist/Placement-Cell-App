@@ -39,6 +39,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (role === 'student' && (response.user.isCoordinator === true || response.user.isCoordinator === 'true')) {
                     role = 'studentCoordinator';
                 }
+                // Automatically route to teacher coordinator portal if teacher is coordinator
+                if (role === 'teacher' && (response.user.isCoordinator === true || response.user.isCoordinator === 'true')) {
+                    role = 'teacherCoordinator';
+                }
 
                 sessionStorage.setItem('currentUser', JSON.stringify(response.user));
                 sessionStorage.setItem('userRole', role);
@@ -68,13 +72,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Role Selection Tabs
     const tabs = document.querySelectorAll('.login-tab');
     const roleInput = document.getElementById('role');
+    const usernameLabel = document.querySelector('label[for="username"]');
+    const usernameInput = document.getElementById('username');
+
+    function updateUsernameField(role) {
+        if (!usernameInput || !usernameLabel) return;
+        if (role === 'student') {
+            usernameLabel.textContent = 'Register Number';
+            usernameInput.placeholder = 'Enter Register Number';
+        } else if (role === 'teacher') {
+            usernameLabel.textContent = 'Phone Number';
+            usernameInput.placeholder = 'Enter Phone Number';
+        } else {
+            usernameLabel.textContent = 'Username';
+            usernameInput.placeholder = 'Enter Admin Username';
+        }
+    }
 
     if (tabs) {
+        updateUsernameField(roleInput.value);
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 tabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 roleInput.value = tab.dataset.role;
+                updateUsernameField(tab.dataset.role);
             });
         });
     }

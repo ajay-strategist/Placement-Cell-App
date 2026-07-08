@@ -55,7 +55,8 @@ body {
     background: #f9fafb;
     display: flex;
     flex-direction: column;
-    max-width: 100%;
+    width: calc(100% - 250px);
+    max-width: calc(100% - 250px);
     overflow-x: hidden;
 }
 
@@ -1399,7 +1400,7 @@ select.form-control { cursor: pointer; }
 
 @media (max-width: 768px) {
     .sidebar { width: 100%; height: auto; position: static; padding: 1.5rem; }
-    .main-content { margin-left: 0; }
+    .main-content { margin-left: 0; width: 100%; max-width: 100%; }
     .content-body { padding: 1rem; }
     .dash-grid-4, .dash-grid-3, .dash-grid-2, .stat-grid-4, .overview-grid-2 {
         grid-template-columns: 1fr !important;
@@ -1512,7 +1513,7 @@ select.form-control { cursor: pointer; }
     padding: .85rem 1rem; border-bottom: 1px solid #e5e7eb;
     white-space: nowrap;
 }
-.premium-ui .table tbody td { padding: .9rem 1rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; white-space: nowrap; }
+.premium-ui .table tbody td { padding: .9rem 1rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; white-space: normal; word-break: break-word; }
 .premium-ui .table tbody tr { transition: background .12s ease; }
 .premium-ui .table tbody tr:hover { background: #f5f8ff; }
 .premium-ui .table tbody tr:last-child td { border-bottom: none; }
@@ -1716,11 +1717,13 @@ select.form-control { cursor: pointer; }
     flex: 1;
     overflow: hidden;
     margin: 0;
+    min-height: 0;
 }
 .premium-modal-body {
     padding: 2rem;
     overflow-y: auto;
     flex: 1;
+    min-height: 0;
 }
 .premium-modal-footer {
     padding: 1.25rem 2rem;

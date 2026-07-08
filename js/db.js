@@ -241,9 +241,26 @@ class Database {
                 this.client.from('class_incharge').select('*')
             ]);
 
-            if (sErr || tErr || pErr || aErr || eErr || attErr || iErr) {
-                console.error("Supabase load errors:", { sErr, tErr, pErr, aErr, eErr, attErr, iErr });
+            if (sErr || tErr || pErr || aErr || eErr || attErr) {
+                console.error("Supabase load errors:", { sErr, tErr, pErr, aErr, eErr, attErr });
                 throw new Error("One or more tables failed to load from Supabase.");
+            }
+
+            if (iErr) {
+                console.warn("class_incharge table not found in Supabase (loading from localStorage backup):", iErr);
+                const localBackup = localStorage.getItem('db_cache');
+                if (localBackup) {
+                    try {
+                        const parsed = JSON.parse(localBackup);
+                        this.cache.classIncharges = parsed.classIncharges || [];
+                    } catch(e) {
+                        this.cache.classIncharges = [];
+                    }
+                } else {
+                    this.cache.classIncharges = [];
+                }
+            } else {
+                this.cache.classIncharges = (inchargesData || []).map(toJSClassIncharge);
             }
 
             // Map data to local cache structures
@@ -253,7 +270,6 @@ class Database {
             this.cache.placementActivities = (activitiesData || []).map(toJSPlacementActivity);
             this.cache.exams = (examsData || []).map(toJSExam);
             this.cache.examAttempts = attemptsData || [];
-            this.cache.classIncharges = (inchargesData || []).map(toJSClassIncharge);
 
             console.log("Supabase initialization complete.");
             
@@ -311,7 +327,14 @@ class Database {
                 error = res.error;
             }
 
-            if (error) throw error;
+            if (error) {
+                if (error.code === 'PGRST205' || (error.message && error.message.includes('schema cache'))) {
+                    console.warn(`Supabase table missing for ${tableName}, saved locally only.`);
+                    localStorage.setItem('db_cache', JSON.stringify(this.cache));
+                    return { success: true, message: 'Saved locally (cloud table missing).' };
+                }
+                throw error;
+            }
             localStorage.setItem('db_cache', JSON.stringify(this.cache));
             return { success: true, message: 'Synced with cloud.' };
         } catch (e) {
@@ -349,7 +372,14 @@ class Database {
                 error = res.error;
             }
 
-            if (error) throw error;
+            if (error) {
+                if (error.code === 'PGRST205' || (error.message && error.message.includes('schema cache'))) {
+                    console.warn(`Supabase table missing for deleting ${tableName}, deleted locally only.`);
+                    localStorage.setItem('db_cache', JSON.stringify(this.cache));
+                    return { success: true };
+                }
+                throw error;
+            }
             localStorage.setItem('db_cache', JSON.stringify(this.cache));
             return { success: true };
         } catch (e) {
@@ -368,6 +398,8 @@ class Database {
         if (this.cache.students.find(s => s.registerNumber === student.registerNumber)) {
             return { success: false, message: 'Student already exists.' };
         }
+        student.password = (student.password || 'password').trim();
+        student.forcePasswordReset = true;
         this.cache.students.push(student);
         const res = await this.sync("Students", student);
         if (res.success) showToast('Student added successfully!', 'success');
@@ -400,6 +432,8 @@ class Database {
             if (this.cache.students.find(s => s.registerNumber === student.registerNumber)) {
                 duplicateCount++;
             } else {
+                student.password = (student.password || 'password').trim();
+                student.forcePasswordReset = true;
                 this.cache.students.push(student);
                 toAdd.push(student);
             }
@@ -434,6 +468,8 @@ class Database {
         if (this.cache.teachers.find(t => t.phoneNumber === teacher.phoneNumber)) {
             return { success: false, message: 'Teacher already exists.' };
         }
+        teacher.password = (teacher.password || 'password').trim();
+        teacher.forcePasswordReset = true;
         this.cache.teachers.push(teacher);
         const res = await this.sync("Teacher", teacher);
         if (res.success) showToast('Teacher coordinator added!', 'success');
@@ -511,6 +547,102 @@ class Database {
         if (res.success) showToast('Program deleted.', 'success');
         return res;
     }
+
+    async toggleRegistration(id) {
+        const program = this.cache.trainingPrograms.find(p => p.id === id);
+        if (program) {
+            program.isRegistrationOpen = !program.isRegistrationOpen;
+            const res = await this.sync("Training Program", program);
+            return {
+                success: res.success,
+                message: `Registration is now ${program.isRegistrationOpen ? 'OPEN' : 'CLOSED'} for ${program.name}.`
+            };
+        }
+        return { success: false, message: 'Program not found.' };
+    }
+
+    async toggleFeedback(id) {
+        const program = this.cache.trainingPrograms.find(p => p.id === id);
+        if (program) {
+            program.isFeedbackOpen = !program.isFeedbackOpen;
+            const res = await this.sync("Training Program", program);
+            return {
+                success: res.success,
+                message: `Feedback is now ${program.isFeedbackOpen ? 'ENABLED' : 'DISABLED'} for ${program.name}.`
+            };
+        }
+        return { success: false, message: 'Program not found.' };
+    }
+
+    async updateAttendance(programId, day, session, regNumbers) {
+        const index = this.cache.trainingPrograms.findIndex(p => p.id === programId);
+        if (index !== -1) {
+            const program = this.cache.trainingPrograms[index];
+            program.sessions = program.sessions || [];
+            let sess = program.sessions.find(s => s.date === day && s.time === session);
+            if (!sess) {
+                sess = {
+                    id: 'SESS' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                    date: day,
+                    time: session,
+                    venue: 'Uploaded via Excel',
+                    attendance: regNumbers
+                };
+                program.sessions.push(sess);
+            } else {
+                sess.attendance = regNumbers;
+            }
+            const res = await this.sync("Training Program", program);
+            return {
+                success: res.success,
+                message: `Attendance updated for ${day} ${session}.`
+            };
+        }
+        return { success: false, message: 'Program not found.' };
+    }
+
+    async updatePhaseCompletions(activityId, phaseId, regNumbers) {
+        const index = this.cache.placementActivities.findIndex(a => a.id === activityId);
+        if (index === -1) return { success: false, message: 'Activity not found.' };
+        const activity = this.cache.placementActivities[index];
+        activity.phases = activity.phases || [];
+        const phaseIndex = activity.phases.findIndex(p => p.id === phaseId);
+        if (phaseIndex === -1) return { success: false, message: 'Phase not found.' };
+        const phase = activity.phases[phaseIndex];
+        
+        let invalidRegNo = null;
+        if (phaseIndex > 0) {
+            const prevPhase = activity.phases[phaseIndex - 1];
+            const prevCompletions = prevPhase.completions || [];
+            for (let reg of regNumbers) {
+                if (!prevCompletions.includes(reg)) {
+                    invalidRegNo = reg;
+                    break;
+                }
+            }
+        }
+        
+        if (invalidRegNo) {
+            const student = this.cache.students.find(s => s.registerNumber === invalidRegNo);
+            const name = student ? student.name : invalidRegNo;
+            const prevPhaseName = activity.phases[phaseIndex - 1].name;
+            return { 
+                success: false, 
+                message: `Cannot qualify student ${name}: they must clear the previous round (${prevPhaseName}) first.` 
+            };
+        }
+        
+        phase.completions = regNumbers;
+        
+        for (let i = phaseIndex + 1; i < activity.phases.length; i++) {
+            activity.phases[i].completions = (activity.phases[i].completions || []).filter(x => regNumbers.includes(x));
+        }
+        
+        const res = await this.sync("Activity", activity);
+        if (res.success) showToast('Qualifications updated successfully!', 'success');
+        return res;
+    }
+
 
     async clearAllTrainingPrograms() {
         if (this.client) {
@@ -656,6 +788,29 @@ class Database {
         }
         const res = await this.sync('ClassIncharge', row);
         if (res.success) showToast(`Class incharge updated for ${className}.`, 'success');
+        return res;
+    }
+
+    async deleteClass(className) {
+        this.cache.classIncharges = this.cache.classIncharges || [];
+        this.cache.classIncharges = this.cache.classIncharges.filter(c => c.className !== className);
+        
+        // Clear class for students assigned to this class
+        this.cache.students = this.cache.students || [];
+        const affectedStudents = [];
+        this.cache.students.forEach(s => {
+            if (s.class === className) {
+                s.class = '';
+                affectedStudents.push(s);
+            }
+        });
+        
+        if (affectedStudents.length > 0) {
+            await this.sync('Students', affectedStudents);
+        }
+        
+        const res = await this.deleteRecord('ClassIncharge', className);
+        if (res.success) showToast(`Class "${className}" deleted successfully.`, 'success');
         return res;
     }
 

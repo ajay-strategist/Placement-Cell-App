@@ -8,6 +8,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userRole = sessionStorage.getItem('userRole') || 'admin';
     const currentUser = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
 
+    // Check for forced password reset
+    const isTeacherCoord = userRole === 'teacherCoordinator';
+    const isStudentCoord = userRole === 'studentCoordinator';
+    if ((isTeacherCoord || isStudentCoord) && (currentUser.forcePasswordReset || currentUser.password === 'password')) {
+        const modal = document.getElementById('resetPassModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.getElementById('saveNewPassBtn').onclick = async () => {
+                const newPass = document.getElementById('newPass').value;
+                const confirmPass = document.getElementById('confirmPass').value;
+                if (newPass.length < 6) {
+                    alert('Password must be at least 6 characters long.');
+                    return;
+                }
+                if (newPass !== confirmPass) {
+                    alert('Passwords do not match.');
+                    return;
+                }
+                const roleType = isTeacherCoord ? 'teacher' : 'student';
+                const idVal = isTeacherCoord ? currentUser.phoneNumber : currentUser.registerNumber;
+                const result = await db.changePassword(roleType, idVal, newPass);
+                if (result.success) {
+                    alert('Password updated successfully! Please login again.');
+                    logout();
+                } else {
+                    alert(result.message || 'Error updating password.');
+                }
+            };
+        }
+    }
+
     // Modal transition helpers
     window.openModal = function(modal) {
         if (!modal) return;
@@ -227,7 +258,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    addStudentForm.addEventListener('submit', (e) => {
+    addStudentForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         if (!Permissions.can(userRole, 'edit_people')) {
@@ -257,30 +288,36 @@ document.addEventListener('DOMContentLoaded', async () => {
                     student.isCoordinator = originalStudent.isCoordinator;
                 }
                 students[index] = { ...originalStudent, ...student };
-                db.saveStudents(students);
-                showAdminAlert('Student updated successfully', 'success');
+                const result = await db.saveStudents(students);
+                if (result.success) {
+                    showAdminAlert('Student updated successfully', 'success');
+                    addStudentForm.reset();
+                    closeModal(studentModal);
+                    renderStudents();
+                } else {
+                    showAdminAlert(result.message || 'Error updating student', 'danger');
+                }
             }
             editingRegNo = null;
         } else {
-            const result = db.addStudent(student);
+            const result = await db.addStudent(student);
             showAdminAlert(result.message, result.success ? 'success' : 'danger');
+            if (result.success) {
+                addStudentForm.reset();
+                closeModal(studentModal);
+                renderStudents();
+            }
         }
-        
-        addStudentForm.reset();
-        studentModal.classList.add('hidden');
-        renderStudents();
     });
 
     // Delete Student Global Function
-    window.deleteStudent = (regNo) => {
-        if (!Permissions.can(userRole, 'edit_people')) {
-            alert("Permission denied.");
-            return;
-        }
-        if(confirm('Are you sure you want to delete this student?')) {
-            db.deleteStudent(regNo);
-            renderStudents();
-            showAdminAlert('Student deleted successfully', 'success');
+    window.deleteStudent = async (regNo) => {
+        if (!Permissions.can(userRole, 'edit_people')) return;
+        if (confirm("Are you sure you want to delete this student?")) {
+            const result = await db.deleteStudent(regNo);
+            if (result.success) {
+                renderStudents();
+            }
         }
     };
 
@@ -450,13 +487,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // Reset Password Function
-    window.resetPassword = (regNo) => {
+    window.resetPassword = async (regNo) => {
         if (!Permissions.can(userRole, 'edit_people')) {
             alert("Permission denied.");
             return;
         }
         if(confirm(`Are you sure you want to reset password for student ${regNo}? They will be forced to change it on next login.`)) {
-            const result = db.resetPassword('student', regNo);
+            const result = await db.resetPassword('student', regNo);
             if(result.success) {
                 showAdminAlert(result.message, 'success');
             }
@@ -532,7 +569,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
             try {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
@@ -567,7 +604,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return;
                 }
 
-                const result = db.addStudentsBulk(newStudents);
+                const result = await db.addStudentsBulk(newStudents);
                 showAdminAlert(result.message, result.success ? 'success' : 'danger');
                 
                 if (result.success) {
@@ -625,7 +662,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    addTeacherForm.addEventListener('submit', (e) => {
+    addTeacherForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         if (!Permissions.can(userRole, 'edit_teachers')) {
@@ -638,7 +675,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             phoneNumber: document.getElementById('tPhone').value.trim(),
             mailId: document.getElementById('tMail').value.trim(),
             department: document.getElementById('tDept').value.trim(),
-            password: document.getElementById('tPass').value,
+            password: (document.getElementById('tPass').value || 'password').trim(),
             isCoordinator: document.getElementById('tIsCoordinator') ? document.getElementById('tIsCoordinator').checked : false
         };
 
@@ -651,29 +688,41 @@ document.addEventListener('DOMContentLoaded', async () => {
                     teacher.isCoordinator = originalTeacher.isCoordinator;
                 }
                 teachers[index] = { ...originalTeacher, ...teacher };
-                db.saveTeachers(teachers);
-                showTeacherAlert('Teacher updated successfully', 'success');
+                const result = await db.saveTeachers(teachers);
+                if (result.success) {
+                    showTeacherAlert('Teacher updated successfully', 'success');
+                    addTeacherForm.reset();
+                    closeModal(teacherModal);
+                    renderTeachers();
+                } else {
+                    showTeacherAlert(result.message || 'Error updating teacher', 'danger');
+                }
             }
             editingTeacherPhone = null;
         } else {
-            const result = db.addTeacher(teacher);
+            const result = await db.addTeacher(teacher);
             showTeacherAlert(result.message, result.success ? 'success' : 'danger');
+            if (result.success) {
+                addTeacherForm.reset();
+                closeModal(teacherModal);
+                renderTeachers();
+            }
         }
-        
-        addTeacherForm.reset();
-        teacherModal.classList.add('hidden');
-        renderTeachers();
     });
 
-    window.deleteTeacher = (phoneNo) => {
+    window.deleteTeacher = async (phoneNo) => {
         if (!Permissions.can(userRole, 'edit_teachers')) {
             alert("Permission denied.");
             return;
         }
         if(confirm('Are you sure you want to delete this teacher?')) {
-            db.deleteTeacher(phoneNo);
-            renderTeachers();
-            showTeacherAlert('Teacher deleted successfully', 'success');
+            const result = await db.deleteTeacher(phoneNo);
+            if (result.success) {
+                renderTeachers();
+                showTeacherAlert('Teacher deleted successfully', 'success');
+            } else {
+                showTeacherAlert(result.message || 'Error deleting teacher', 'danger');
+            }
         }
     };
 
@@ -877,7 +926,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (addTrainingForm) {
-        addTrainingForm.addEventListener('submit', (e) => {
+        addTrainingForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const targetType = document.querySelector('input[name="targetType"]:checked').value;
             const selectedCourses = Array.from(document.querySelectorAll('input[name="targetCourses"]:checked')).map(cb => cb.value);
@@ -897,19 +946,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                 endDate: document.getElementById('trnEndDate').value
             };
 
+            let result;
             if (editingProgramId) {
-                const result = db.updateTrainingProgram(editingProgramId, program);
+                result = await db.updateTrainingProgram(editingProgramId, program);
                 showTrainingAlert(result.message, result.success ? 'success' : 'danger');
-                editingProgramId = null;
+                if (result.success) editingProgramId = null;
             } else {
-                const result = db.addTrainingProgram(program);
+                result = await db.addTrainingProgram(program);
                 showTrainingAlert(result.message, result.success ? 'success' : 'danger');
             }
             
-            addTrainingForm.reset();
-            document.getElementById('trnDesc').innerHTML = '';
-            trainingModal.classList.add('hidden');
-            renderTrainingPrograms();
+            if (result.success) {
+                addTrainingForm.reset();
+                document.getElementById('trnDesc').innerHTML = '';
+                closeModal(trainingModal);
+                renderTrainingPrograms();
+            }
         });
     }
 
@@ -1013,31 +1065,47 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
 
-    window.toggleTrnReg = (id) => {
-        const result = db.toggleRegistration(id);
-        showTrainingAlert(result.message, 'success');
-        renderTrainingPrograms();
-    };
-
-    window.toggleFeedback = (id) => {
-        const result = db.toggleFeedback(id);
-        showTrainingAlert(result.message, 'success');
-        renderTrainingPrograms();
-    };
-
-    window.deleteTrainingProgram = (id) => {
-        if (confirm('Are you sure you want to delete this training program? This will also remove all its sessions and attendance records.')) {
-            const result = db.deleteTrainingProgram(id);
+    window.toggleTrnReg = async (id) => {
+        const result = await db.toggleRegistration(id);
+        if (result.success) {
             showTrainingAlert(result.message, 'success');
             renderTrainingPrograms();
+        } else {
+            showTrainingAlert(result.message || 'Error toggling registration', 'danger');
         }
     };
 
-    window.clearAllTrainingPrograms = () => {
-        if (confirm('WARNING: Are you sure you want to delete ALL training programs? This action cannot be undone.')) {
-            const result = db.clearAllTrainingPrograms();
+    window.toggleFeedback = async (id) => {
+        const result = await db.toggleFeedback(id);
+        if (result.success) {
             showTrainingAlert(result.message, 'success');
             renderTrainingPrograms();
+        } else {
+            showTrainingAlert(result.message || 'Error toggling feedback', 'danger');
+        }
+    };
+
+    window.deleteTrainingProgram = async (id) => {
+        if (confirm('Are you sure you want to delete this training program? This will also remove all its sessions and attendance records.')) {
+            const result = await db.deleteTrainingProgram(id);
+            if (result.success) {
+                showTrainingAlert(result.message || 'Program deleted successfully.', 'success');
+                renderTrainingPrograms();
+            } else {
+                showTrainingAlert(result.message || 'Error deleting program.', 'danger');
+            }
+        }
+    };
+
+    window.clearAllTrainingPrograms = async () => {
+        if (confirm('WARNING: Are you sure you want to delete ALL training programs? This action cannot be undone.')) {
+            const result = await db.clearAllTrainingPrograms();
+            if (result.success) {
+                showTrainingAlert(result.message || 'All programs deleted.', 'success');
+                renderTrainingPrograms();
+            } else {
+                showTrainingAlert(result.message || 'Error deleting programs.', 'danger');
+            }
         }
     };
 
@@ -1091,7 +1159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = async (e) => {
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
@@ -1106,10 +1174,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                         return;
                     }
 
-                    const result = db.updateAttendance(programId, day, session, regNumbers);
+                    const result = await db.updateAttendance(programId, day, session, regNumbers);
                     if (result.success) {
                         alert(`Attendance for ${day} ${session} uploaded: ${regNumbers.length} students.`);
                         document.getElementById('attnExcelFile').value = '';
+                    } else {
+                        alert(result.message || 'Error uploading attendance.');
                     }
                 } catch (err) {
                     console.error(err);
@@ -1316,7 +1386,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if(addPlacementForm) {
-        addPlacementForm.addEventListener('submit', (e) => {
+        addPlacementForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const targetType = document.querySelector('input[name="pTargetType"]:checked').value;
             const courses = Array.from(document.querySelectorAll('input[name="pCourses"]:checked')).map(c => c.value);
@@ -1333,19 +1403,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                 target: { type: targetType, courses, depts, students: selectedStudents }
             };
 
+            let result;
             if (editingPlacementId) {
-                const result = db.updatePlacementActivity(editingPlacementId, activity);
+                result = await db.updatePlacementActivity(editingPlacementId, activity);
                 showPlacementAlert(result.message, result.success ? 'success' : 'danger');
-                editingPlacementId = null;
+                if (result.success) editingPlacementId = null;
             } else {
-                const result = db.addPlacementActivity(activity);
+                result = await db.addPlacementActivity(activity);
                 showPlacementAlert(result.message, result.success ? 'success' : 'danger');
             }
             
-            addPlacementForm.reset();
-            document.getElementById('pDesc').innerHTML = '';
-            placementModal.classList.add('hidden');
-            renderPlacementActivities();
+            if (result.success) {
+                addPlacementForm.reset();
+                document.getElementById('pDesc').innerHTML = '';
+                closeModal(placementModal);
+                renderPlacementActivities();
+            }
         });
     }
 
@@ -1481,11 +1554,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    window.deletePlacementActivity = (id) => {
+    window.deletePlacementActivity = async (id) => {
         if(confirm('Are you sure you want to delete this placement activity and all associated data?')) {
-            db.deletePlacementActivity(id);
-            renderPlacementActivities();
-            showPlacementAlert('Activity deleted successfully.', 'success');
+            const result = await db.deletePlacementActivity(id);
+            if (result.success) {
+                renderPlacementActivities();
+                showPlacementAlert('Activity deleted successfully.', 'success');
+            } else {
+                showPlacementAlert(result.message || 'Error deleting activity.', 'danger');
+            }
         }
     };
 
@@ -1925,7 +2002,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const phaseForm = document.getElementById('phaseForm');
     if(phaseForm) {
-        phaseForm.onsubmit = (e) => {
+        phaseForm.onsubmit = async (e) => {
             e.preventDefault();
             const phase = {
                 name: document.getElementById('phaseName').value,
@@ -1934,14 +2011,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 mode: document.querySelector('input[name="phaseMode"]:checked').value
             };
 
+            let result;
             if (editingPhaseId) {
-                db.updatePlacementPhase(currentActivityId, editingPhaseId, phase);
+                result = await db.updatePlacementPhase(currentActivityId, editingPhaseId, phase);
             } else {
-                db.addPlacementPhase(currentActivityId, phase);
+                result = await db.addPlacementPhase(currentActivityId, phase);
             }
 
-            document.getElementById('phaseModal').classList.add('hidden');
-            openManagePlacementView(currentActivityId); // Refresh
+            if (result.success) {
+                closeModal(document.getElementById('phaseModal'));
+                openManagePlacementView(currentActivityId); // Refresh
+            }
         };
     }
 
@@ -1958,10 +2038,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('phaseModal').classList.remove('hidden');
     };
 
-    window.deletePhase = (id) => {
+    window.deletePhase = async (id) => {
         if (confirm('Are you sure you want to delete this phase and all student completion data?')) {
-            db.deletePlacementPhase(currentActivityId, id);
-            openManagePlacementView(currentActivityId);
+            const result = await db.deletePlacementPhase(currentActivityId, id);
+            if (result.success) {
+                openManagePlacementView(currentActivityId);
+            }
         }
     };
 
@@ -1995,16 +2077,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
         });
 
-        document.getElementById('saveDeclarationBtn').onclick = () => {
+        document.getElementById('saveDeclarationBtn').onclick = async () => {
             const selected = Array.from(document.querySelectorAll('input[name="declCheck"]:checked')).map(cb => cb.value);
             
-            pool.forEach(s => {
-                const isNowComplete = selected.includes(s.registerNumber);
-                db.togglePhaseCompletion(currentActivityId, phaseId, s.registerNumber, isNowComplete);
-            });
-
-            document.getElementById('declarationModal').classList.add('hidden');
-            openManagePlacementView(currentActivityId);
+            const result = await db.updatePhaseCompletions(currentActivityId, phaseId, selected);
+            if (result.success) {
+                closeModal(document.getElementById('declarationModal'));
+                openManagePlacementView(currentActivityId);
+            } else {
+                alert(result.message || 'Error updating qualifications.');
+            }
         };
 
         document.getElementById('declarationModal').classList.remove('hidden');
@@ -2321,6 +2403,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <h4 style="margin:0; color:#0f172a; font-weight: 800; font-size:1.15rem; letter-spacing:-0.02em;">${cn}</h4>
                             <small class="text-muted" style="font-size:0.82rem; margin-top:0.25rem; display:block;">Incharge: <strong id="inch_${btoa(cn).replace(/=/g,'')}" style="color:#475569;">${incharge}</strong>
                                 <a href="#" onclick="editClassIncharge('${safe}');return false;" style="margin-left:6px; font-size:0.75rem; color:#2563eb; font-weight:600; text-decoration:none;">✏️ edit</a>
+                                <a href="#" onclick="confirmDeleteClass('${safe}');return false;" style="margin-left:8px; font-size:0.75rem; color:#dc2626; font-weight:600; text-decoration:none;">🗑️ delete</a>
                             </small>
                         </div>
                         <span class="badge" style="background:#eff6ff; color:#2563eb; font-weight:700; font-size:0.8rem; padding:6px 12px; border-radius:8px;">${list.length} students</span>
@@ -2344,6 +2427,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (name !== null) {
             db.setClassIncharge(className, name.trim());
             renderClassView();
+        }
+    };
+
+    window.confirmDeleteClass = async function (className) {
+        if (confirm(`Are you sure you want to delete class "${className}"? This will also unassign all students in this class.`)) {
+            const result = await db.deleteClass(className);
+            if (result.success) {
+                renderClassView();
+            }
         }
     };
 
@@ -2567,31 +2659,76 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!title) { alert('Enter an exam title.'); return; }
         
         const questions = [];
-        document.querySelectorAll('#examQuestions [data-q]').forEach(div => {
+        let hasError = false;
+        let errorMsg = '';
+        
+        const qContainers = document.querySelectorAll('#examQuestions [data-q]');
+        for (let j = 0; j < qContainers.length; j++) {
+            const div = qContainers[j];
             const text = div.querySelector('.q-text').value.trim();
             const type = div.querySelector('.q-type').value;
             const marks = Number(div.querySelector('.q-marks').value) || 1;
             const explanation = div.querySelector('.q-explanation').value.trim();
-            if (!text) return;
-            let options = [], correct = [];
+
+            if (!text) {
+                hasError = true;
+                errorMsg = `Question ${j + 1}: Question text cannot be empty.`;
+                break;
+            }
+
+            let options = [];
+            let correct = [];
+
             if (type === 'truefalse') {
                 options = ['True', 'False'];
                 const c = div.querySelector('.q-correct:checked');
-                correct = [c ? c.value : 'True'];
+                if (!c) {
+                    hasError = true;
+                    errorMsg = `Question ${j + 1}: Please select the correct True/False answer.`;
+                    break;
+                }
+                correct = [c.value];
             } else {
                 const optInputs = div.querySelectorAll('.q-opt');
-                options = Array.from(optInputs).map(i => i.value.trim()).filter(v => v);
-                div.querySelectorAll('.q-correct:checked').forEach(c => {
+                const rawOptions = Array.from(optInputs).map(i => i.value.trim());
+                options = rawOptions.filter(Boolean);
+
+                if (options.length < 2) {
+                    hasError = true;
+                    errorMsg = `Question ${j + 1}: Provide at least 2 options.`;
+                    break;
+                }
+
+                const checked = div.querySelectorAll('.q-correct:checked');
+                if (checked.length === 0) {
+                    hasError = true;
+                    errorMsg = `Question ${j + 1}: Please check at least one correct option.`;
+                    break;
+                }
+
+                checked.forEach(c => {
                     const i = Number(c.value);
-                    if (options[i] !== undefined) correct.push(options[i]);
+                    if (rawOptions[i]) {
+                        correct.push(rawOptions[i]);
+                    }
                 });
+
+                if (correct.length === 0) {
+                    hasError = true;
+                    errorMsg = `Question ${j + 1}: Checked correct option(s) must not be empty.`;
+                    break;
+                }
             }
-            if (options.length && correct.length) {
-                questions.push({ text, type, marks, options, correct, explanation });
-            }
-        });
+
+            questions.push({ text, type, marks, options, correct, explanation });
+        }
+
+        if (hasError) {
+            alert(errorMsg);
+            return;
+        }
         
-        if (questions.length === 0) { alert('Add at least one complete question with a correct answer.'); return; }
+        if (questions.length === 0) { alert('Add at least one complete question.'); return; }
 
         const selectedCourses = Array.from(document.querySelectorAll('.ex-course-checkbox:checked')).map(cb => cb.value);
         const selectedClasses = Array.from(document.querySelectorAll('.ex-class-checkbox:checked')).map(cb => cb.value);
@@ -2763,8 +2900,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const targetedStudents = students.filter(s => {
             const t = exam.target || { type: 'all' };
             if (!t || t.type === 'all') return true;
-            const matchesCourse = t.courses && t.courses.length > 0 && t.courses.includes(s.course);
-            const matchesClass = t.classes && t.classes.length > 0 && t.classes.includes(s.class);
+            const studentCourse = (s.course || '').trim().toLowerCase();
+            const studentClass = (s.class || '').trim().toLowerCase();
+            const matchesCourse = t.courses && t.courses.length > 0 && t.courses.map(x => x.trim().toLowerCase()).includes(studentCourse);
+            const matchesClass = t.classes && t.classes.length > 0 && t.classes.map(x => x.trim().toLowerCase()).includes(studentClass);
             if (t.courses && t.courses.length > 0 && t.classes && t.classes.length > 0) {
                 return matchesCourse || matchesClass;
             } else if (t.courses && t.courses.length > 0) {

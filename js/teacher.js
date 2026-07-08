@@ -18,9 +18,40 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!user || userRole !== 'teacher') return;
 
+    // Check for forced password reset
+    const teachers = db.getTeachers();
+    const currentTeacher = teachers.find(t => t.phoneNumber === user.phoneNumber);
+    if (currentTeacher && (currentTeacher.forcePasswordReset || currentTeacher.password === 'password')) {
+        const modal = document.getElementById('resetPassModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.getElementById('saveNewPassBtn').onclick = async () => {
+                const newPass = document.getElementById('newPass').value;
+                const confirmPass = document.getElementById('confirmPass').value;
+                if (newPass.length < 6) {
+                    alert('Password must be at least 6 characters long.');
+                    return;
+                }
+                if (newPass !== confirmPass) {
+                    alert('Passwords do not match.');
+                    return;
+                }
+                const result = await db.changePassword('teacher', user.phoneNumber, newPass);
+                if (result.success) {
+                    alert('Password updated successfully! Please login again.');
+                    logout();
+                } else {
+                    alert(result.message || 'Error updating password.');
+                }
+            };
+        }
+    }
+
     // Header logic
     const teacherNameEl = document.getElementById('teacherName');
     if (teacherNameEl) teacherNameEl.textContent = `Welcome, ${user.name}`;
+    const userRoleEl = document.querySelector('.user-role');
+    if (userRoleEl) userRoleEl.textContent = 'Teacher';
 
     // Fill Profile Modal
     const pDeptEl = document.getElementById('pDept');

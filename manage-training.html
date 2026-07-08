@@ -84,22 +84,22 @@
                     <div class="glass-card">
                         <div class="mb-3">
                             <h5 class="mb-3">List of Registered Students</h5>
-                            <div class="d-flex align-items-end gap-2" style="flex-wrap:wrap;">
+                            <div class="d-flex align-items-end gap-2 flex-wrap">
                                 <div class="form-group mb-0">
-                                    <label class="form-label">Batch</label>
-                                    <select id="regBatchFilter" class="form-control" style="min-width:160px;">
+                                    <label class="form-label" style="font-weight:600; font-size:0.8rem; color:#4b5563;">Filter Batch</label>
+                                    <select id="regBatchFilter" class="form-control" style="min-width:160px; height:40px;">
                                         <option value="">All Batches</option>
                                     </select>
                                 </div>
                                 <div class="form-group mb-0">
-                                    <label class="form-label">Department</label>
-                                    <select id="regDeptFilter" class="form-control" style="min-width:160px;">
+                                    <label class="form-label" style="font-weight:600; font-size:0.8rem; color:#4b5563;">Filter Department</label>
+                                    <select id="regDeptFilter" class="form-control" style="min-width:160px; height:40px;">
                                         <option value="">All Departments</option>
                                     </select>
                                 </div>
                                 <div style="flex:1 1 auto;"></div>
-                                <div class="d-flex align-items-center gap-2 mb-0" style="height:40px;">
-                                    <label class="form-label mb-0" style="white-space:nowrap; font-size:0.85rem; font-weight:600; color:#4b5563;">Assign Selected To:</label>
+                                <div class="form-group mb-0">
+                                    <label class="form-label" style="font-weight:600; font-size:0.8rem; color:#4b5563;">Assign Selected To</label>
                                     <select id="bulkBatchSelect" class="form-control" style="min-width:170px; height:40px;">
                                         <option value="">Assign to Batch...</option>
                                     </select>
@@ -135,8 +135,11 @@
                         </div>
                         <!-- Auto-split panel -->
                         <div class="mb-4" style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); padding: 1.5rem;">
-                            <h6 style="color: #1e293b; margin-bottom:0.75rem; font-weight:700;">⚡ Auto-Split Students into Batches</h6>
-                            <div class="d-flex flex-wrap gap-2 align-items-end">
+                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                                <h6 style="color: #1e293b; margin: 0; font-weight:700;">⚡ Auto-Split Students into Batches</h6>
+                                <small class="text-danger" style="font-weight: 600;">⚠️ This will overwrite existing batch assignments.</small>
+                            </div>
+                            <div class="d-flex flex-wrap gap-3 align-items-end">
                                 <div class="form-group mb-0">
                                     <label class="form-label" style="font-weight:600; font-size:0.8rem; color:#4b5563;">Split Method</label>
                                     <select id="autoSplitMethod" class="form-control" style="min-width:180px; height:40px;">
@@ -146,17 +149,11 @@
                                         <option value="by_department">By Department</option>
                                     </select>
                                 </div>
-                                <div class="form-group mb-0">
+                                <div class="form-group mb-0" id="autoSplitValueGroup">
                                     <label class="form-label" id="autoSplitValueLabel" style="font-weight:600; font-size:0.8rem; color:#4b5563;">Number of Batches</label>
                                     <input type="number" id="autoSplitValue" class="form-control" min="1" value="3" style="width:120px; height:40px;">
                                 </div>
-                                <div class="form-group mb-0">
-                                    <label class="form-label" style="visibility:hidden; font-size:0.8rem; margin-bottom: 0.5rem; display: block;">Spacer</label>
-                                    <button class="btn btn-primary btn-sm" id="autoSplitBtn" style="height:40px; font-weight:600; padding:0 1.25rem; display:inline-flex; align-items:center;">Auto Split</button>
-                                </div>
-                                <div class="form-group mb-0" style="padding-bottom: 10px;">
-                                    <small class="text-muted">⚠️ This will overwrite existing batch assignments.</small>
-                                </div>
+                                <button class="btn btn-primary btn-sm" id="autoSplitBtn" style="height:40px; font-weight:600; padding:0 1.5rem;">Auto Split</button>
                             </div>
                         </div>
                         <div id="batchesList" style="display:flex; flex-direction:column; gap:1rem;"></div>
@@ -439,10 +436,10 @@
             });
 
             // --- Batch management events ---
-            document.getElementById('addBatchBtn').addEventListener('click', () => {
+            document.getElementById('addBatchBtn').addEventListener('click', async () => {
                 const name = prompt('Enter batch name (e.g. Batch A):');
                 if (name && name.trim()) {
-                    const result = db.addTrainingBatch(programId, name.trim());
+                    const result = await db.addTrainingBatch(programId, name.trim());
                     alert(result.message);
                     renderPage();
                     renderBatchesTab();
@@ -451,40 +448,43 @@
 
             document.getElementById('autoSplitMethod').addEventListener('change', () => {
                 const method = document.getElementById('autoSplitMethod').value;
-                const valueInput = document.getElementById('autoSplitValue');
+                const group = document.getElementById('autoSplitValueGroup');
                 const valueLabel = document.getElementById('autoSplitValueLabel');
                 const needsValue = (method === 'num_batches' || method === 'batch_size');
-                // Hide the numeric value field for grouping methods
-                valueInput.style.display = needsValue ? '' : 'none';
-                valueLabel.style.display = needsValue ? '' : 'none';
-                if (method === 'num_batches') valueLabel.textContent = 'Number of Batches';
-                else if (method === 'batch_size') valueLabel.textContent = 'Max Students per Batch';
+                
+                if (needsValue) {
+                    group.style.display = 'block';
+                    if (method === 'num_batches') valueLabel.textContent = 'Number of Batches';
+                    else if (method === 'batch_size') valueLabel.textContent = 'Max Students per Batch';
+                } else {
+                    group.style.display = 'none';
+                }
             });
 
-            document.getElementById('autoSplitBtn').addEventListener('click', () => {
+            document.getElementById('autoSplitBtn').addEventListener('click', async () => {
                 const method = document.getElementById('autoSplitMethod').value;
                 const value = document.getElementById('autoSplitValue').value;
                 if(!confirm('This will overwrite all existing batch assignments. Continue?')) return;
-                const result = db.autoSplitTrainingBatches(programId, method, value);
+                const result = await db.autoSplitTrainingBatches(programId, method, value);
                 alert(result.message);
                 renderPage();
                 renderBatchesTab();
             });
 
-            document.getElementById('bulkAssignBtn').addEventListener('click', () => {
+            document.getElementById('bulkAssignBtn').addEventListener('click', async () => {
                 const batchId = document.getElementById('bulkBatchSelect').value;
                 if (!batchId) { alert('Please select a batch from the "Assign to Batch..." dropdown.'); return; }
                 const checked = Array.from(document.querySelectorAll('.reg-student-cb:checked')).map(cb => cb.value);
                 if (checked.length === 0) { alert('Please select at least one student using the checkboxes.'); return; }
-                const result = db.assignStudentsToBatch(programId, checked, batchId);
+                const result = await db.assignStudentsToBatch(programId, checked, batchId);
                 alert(result.message);
                 renderPage();
             });
 
-            document.getElementById('removeFromBatchBtn').addEventListener('click', () => {
+            document.getElementById('removeFromBatchBtn').addEventListener('click', async () => {
                 const checked = Array.from(document.querySelectorAll('.reg-student-cb:checked')).map(cb => cb.value);
                 if (checked.length === 0) { alert('Please select at least one student using the checkboxes.'); return; }
-                const result = db.assignStudentsToBatch(programId, checked, '');
+                const result = await db.assignStudentsToBatch(programId, checked, '');
                 alert(`Removed ${checked.length} student(s) from their batch.`);
                 renderPage();
             });
@@ -915,9 +915,9 @@
             document.getElementById('attnModal').classList.remove('hidden');
         };
 
-        window.confirmDeleteSession = (sid, date) => {
+        window.confirmDeleteSession = async (sid, date) => {
             if (confirm(`Are you sure you want to delete the session on ${date}? This will also remove all attendance records for this session.`)) {
-                db.deleteSession(programId, sid);
+                await db.deleteSession(programId, sid);
                 renderPage();
             }
         };
@@ -946,7 +946,7 @@
             document.getElementById('editSessionModal').classList.remove('hidden');
         };
 
-        document.getElementById('saveEditSessionBtn').addEventListener('click', () => {
+        document.getElementById('saveEditSessionBtn').addEventListener('click', async () => {
             const newDate = document.getElementById('editSessionDate').value;
             const newTimeRaw = document.getElementById('editSessionTime').value;
             const newBatchId = document.getElementById('editSessionBatch') ? document.getElementById('editSessionBatch').value : '';
@@ -956,9 +956,13 @@
             const period = hour >= 12 ? 'PM' : 'AM';
             const hour12 = hour % 12 || 12;
             const formattedTime = `${hour12}:${m} ${period}`;
-            db.updateSession(programId, editingSessionId, newDate, formattedTime, newBatchId);
-            document.getElementById('editSessionModal').classList.add('hidden');
-            renderPage();
+            const result = await db.updateSession(programId, editingSessionId, newDate, formattedTime, newBatchId);
+            if (result.success) {
+                closeModal(document.getElementById('editSessionModal'));
+                renderPage();
+            } else {
+                alert(result.message || 'Error updating session.');
+            }
         });
 
         document.getElementById('confirmAttnUpload').addEventListener('click', () => {
@@ -966,20 +970,22 @@
             if(!file) return;
 
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = async (e) => {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, {type: 'array'});
                 const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                 const jsonData = XLSX.utils.sheet_to_json(firstSheet);
                 
                 const regNumbers = jsonData.map(row => String(row['Register Number'] || row['Reg No'] || '').trim()).filter(r => r);
-                const result = db.updateSessionAttendance(programId, activeSessionId, regNumbers);
+                const result = await db.updateSessionAttendance(programId, activeSessionId, regNumbers);
                 
                 alert(result.message);
-                document.getElementById('attnModal').classList.add('hidden');
-                document.getElementById('attnFile').value = '';
-                renderPage();
-                renderBatchesTab();
+                if (result.success) {
+                    closeModal(document.getElementById('attnModal'));
+                    document.getElementById('attnFile').value = '';
+                    renderPage();
+                    renderBatchesTab();
+                }
             };
             reader.readAsArrayBuffer(file);
         });
@@ -1042,15 +1048,17 @@
             document.querySelectorAll('.manual-attn-cb').forEach(cb => cb.checked = false);
         });
 
-        document.getElementById('saveManualAttnBtn').addEventListener('click', () => {
+        document.getElementById('saveManualAttnBtn').addEventListener('click', async () => {
             const checkboxes = document.querySelectorAll('.manual-attn-cb:checked');
             const regNumbers = Array.from(checkboxes).map(cb => cb.value);
             
-            const result = db.updateSessionAttendance(programId, activeManualSessionId, regNumbers);
+            const result = await db.updateSessionAttendance(programId, activeManualSessionId, regNumbers);
             alert(result.message);
-            document.getElementById('manualAttnModal').classList.add('hidden');
-            renderPage();
-            renderBatchesTab();
+            if (result.success) {
+                closeModal(document.getElementById('manualAttnModal'));
+                renderPage();
+                renderBatchesTab();
+            }
         });
 
         function renderDashboard() {
@@ -1177,12 +1185,12 @@
             if (el) el.classList.toggle('hidden');
         };
 
-        window.addBatchSession = (batchId) => {
+        window.addBatchSession = async (batchId) => {
             const date = document.getElementById('bsDate_' + batchId).value;
             const time = document.getElementById('bsTime_' + batchId).value;
             const venue = document.getElementById('bsVenue_' + batchId).value;
             if (!date) { alert('Please choose a date.'); return; }
-            const res = db.addTrainingSession(programId, date, time, batchId, venue);
+            const res = await db.addTrainingSession(programId, date, time, batchId, venue);
             if (!res.success) { alert(res.message); return; }
             renderPage();
             renderBatchesTab();
@@ -1231,16 +1239,20 @@
                 </table></div>`);
         };
 
-        window.transferStudent = (regNo, newBatchId, fromBatchId) => {
+        window.transferStudent = async (regNo, newBatchId, fromBatchId) => {
             if (!newBatchId) return;
             const target = newBatchId === '__none__' ? '' : newBatchId;
-            const res = db.assignStudentsToBatch(programId, [regNo], target);
-            renderPage();
-            renderBatchesTab();
-            closeGenericModal();
+            const res = await db.assignStudentsToBatch(programId, [regNo], target);
+            if (res.success) {
+                renderPage();
+                renderBatchesTab();
+                closeGenericModal();
+            } else {
+                alert(res.message || 'Error transferring student.');
+            }
         };
 
-        window.renameBatch = (batchId, currentName) => {
+        window.renameBatch = async (batchId, currentName) => {
             const newName = prompt('Enter new batch name:', currentName);
             if (newName && newName.trim() && newName.trim() !== currentName) {
                 const p = getProg();
@@ -1249,19 +1261,21 @@
                     const prog = db.cache.trainingPrograms[idx];
                     prog.batches = prog.batches || [];
                     const b = prog.batches.find(b => b.id === batchId);
-                    if (b) { b.name = newName.trim(); db.sync('Training Program', prog); }
+                    if (b) { b.name = newName.trim(); await db.sync('Training Program', prog); }
                 }
                 renderPage();
                 renderBatchesTab();
             }
         };
 
-        window.deleteBatch = (batchId, batchName) => {
+        window.deleteBatch = async (batchId, batchName) => {
             if (confirm(`Delete batch "${batchName}"? Students will be unassigned.`)) {
-                const result = db.deleteTrainingBatch(programId, batchId);
+                const result = await db.deleteTrainingBatch(programId, batchId);
                 alert(result.message);
-                renderPage();
-                renderBatchesTab();
+                if (result.success) {
+                    renderPage();
+                    renderBatchesTab();
+                }
             }
         };
 
